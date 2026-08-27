@@ -1,6 +1,6 @@
 ---
 name: new-book
-description: 새 전자책 프로젝트를 시작하거나 기존 프로젝트를 이어서 HannaK Ebook Team 파이프라인(Publisher → Researcher → Writer → Fact Checker → Editor → Visual Director → Production → Content Connector)을 순서대로 돌린다. 사용자가 "NEW BOOK", "새 책 시작", 한 줄 주제 아이디어, 기획보고서 파일, 또는 이미 쓰여진(반쯤 완성된) 원고를 줄 때 사용한다.
+description: 새 전자책 프로젝트를 시작하거나 기존 프로젝트를 이어서 HannaK Ebook Team 파이프라인(Publisher → Researcher → Writer → Fact Checker → Editor → Visual Director → Production → Content Connector)을 순서대로 돌린다. 사용자가 "NEW BOOK", "새 책 시작", 한 줄 주제 아이디어, 기획보고서 파일, 또는 이미 쓰여진(반쯤 완성된) 원고를 줄 때 사용한다. 반쯤 완성된 원고에 목표 분량(페이지/단어수)이 함께 주어지면 Writer의 증강 모드로 그 분량까지 확장한다.
 ---
 
 # New Book
@@ -23,10 +23,15 @@ HannaK Ebook Team의 오케스트레이션 스킬. 아이디어 하나, 기획�
 ## 기존 원고 편입 절차 (반쯤 완성된 원고를 받은 경우)
 
 1. **프로젝트 식별**: 기존에 진행 중이던 `books/<slug>/`가 있으면 그 프로젝트에 이어붙인다. 없으면(완전히 새 책인데 원고부터 있는 경우) 먼저 프로젝트 폴더를 만들고, `00-brief.md`가 없으면 Publisher를 호출해 기획서부터 만든다(제목/목차/독자층 등은 원고 내용에서 역으로 추론하되, 불확실한 항목은 사용자에게 확인).
-2. **원고 저장**: 받은 챕터를 있는 그대로 `books/<slug>/02-chapters/<chapter-number>-<chapter-slug>.md`에 저장한다 (Writer가 쓴 것과 동일한 위치 — Writer는 건너뛴다). 원본 그대로도 참고용으로 남기고 싶으면 별도 보관.
-3. **Fact Checker는 항상 실행**: 사용자가 직접 썼든 Writer가 썼든 관계없이, 이 챕터들도 똑같이 Fact Checker로 독립 검증한다. "사용자가 썼으니 믿을 만하다"고 건너뛰지 않는다.
-4. **빠진 챕터 확인**: `00-brief.md`의 목차와 대조해서 아직 안 쓰인 챕터가 있으면, 그 챕터들만 정상 순서(Researcher → Writer → Fact Checker)로 진행한다.
-5. 이후부터는 전체 챕터(기존 원고 + 새로 쓴 챕터)를 모아 Editor → Visual Director → Production → Content Connector로 정상 진행한다.
+2. **원고 저장**: 받은 챕터를 있는 그대로 `books/<slug>/02-chapters/<chapter-number>-<chapter-slug>.md`에 저장한다 (Writer가 쓴 것과 동일한 위치). 원본 그대로도 참고용으로 남기고 싶으면 별도 보관.
+3. **목표 분량 확인**: 사용자가 목표 페이지/단어수를 줬는지 확인한다.
+   - 안 줬으면 현재 원고 그대로 다음 단계(Fact Checker)로 넘어간다.
+   - **줬으면**, 저장된 원고 분량과 비교한다. 이미 목표치 이상이면 그대로 진행. 부족하면:
+     a. 해당 챕터에 리서치 자료가 부족해 보이면 **Researcher**를 먼저 호출해 추가 조사(`01-research/<chapter>.md`에 보강)한다.
+     b. **Writer를 증강(모드 2)으로 호출** — 기존 원고 + 리서치 + 목표 분량을 넘겨서 확장한다. Writer는 원문을 재작성하지 않고, 사실 근거가 있는 내용만 덧붙인다는 점을 호출 프롬프트에 명시한다.
+4. **Fact Checker는 항상 실행**: 사용자가 직접 썼든 Writer가 썼든, 증강 전이든 후든 관계없이 이 챕터들도 똑같이 Fact Checker로 독립 검증한다. "사용자가 썼으니 믿을 만하다"고 건너뛰지 않는다 — 원문과 증강분 모두 검수 대상이다.
+5. **빠진 챕터 확인**: `00-brief.md`의 목차와 대조해서 아직 안 쓰인 챕터가 있으면, 그 챕터들만 정상 순서(Researcher → Writer 모드 1(신규 집필) → Fact Checker)로 진행한다.
+6. 이후부터는 전체 챕터(기존 원고 + 증강된 원고 + 새로 쓴 챕터)를 모아 Editor → Visual Director → Production → Content Connector로 정상 진행한다.
 
 ## 진행 순서 (처음부터 시작하는 경우)
 
