@@ -4,6 +4,15 @@ Claude Code를 지휘자로 삼아 전자책을 기획→조사→집필→검�
 
 한 번 세팅해두고, 새 책 아이디어가 나올 때마다 `books/`에 새 프로젝트만 만들어서 같은 팀을 재사용한다.
 
+## 브랜드 전략 (최상위 문서)
+
+`docs/brand-strategy.md`가 모든 책 위에 있는 최상위 브랜드/사업 전략 문서다. Publisher와 Content Connector는 새 책을 기획하거나 교차판매를 매핑할 때 반드시 이 문서를 먼저 확인한다. 핵심 요지:
+
+- 최상위 브랜드는 **KOREA**, 하위 축은 Korean Food / Culture / History / Great Koreans / Beauty / Education / Lifestyle / Travel.
+- 콘텐츠는 **본편(Core Series, 번호형)**과 **스페셜 에디션(Special Edition, 무번호·독립 출시)**의 이원 구조.
+- 모든 콘텐츠는 제작 전 3가지 질문을 통과해야 한다: (1) 외국인이 실제로 궁금해할 질문인가 (2) 독립 구매할 맥락이 있는가 (3) 완성 후 최소 2개 이상의 연관 콘텐츠와 연결되는가.
+- 초기 우선 축은 Korean Food / Korean Culture / Korean Travel. (현재 Food·Culture는 진행중 — 상세 진행 상황은 `docs/brand-strategy.md`의 "진행 상황" 표 참고)
+
 ## 팀 구성 (서브에이전트)
 
 `.claude/agents/`에 8개의 역할이 정의되어 있고, Claude Code의 Agent 툴로 `subagent_type`을 지정해서 호출한다.
