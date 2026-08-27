@@ -1,24 +1,34 @@
 ---
 name: new-book
-description: 새 전자책 프로젝트를 시작하고 HannaK Ebook Team 파이프라인(Publisher → Researcher → Writer → Fact Checker → Editor → Visual Director → Production → Content Connector)을 순서대로 돌린다. 사용자가 "NEW BOOK", "새 책 시작", 한 줄 주제 아이디어, 또는 기획보고서 파일을 줄 때 사용한다.
+description: 새 전자책 프로젝트를 시작하거나 기존 프로젝트를 이어서 HannaK Ebook Team 파이프라인(Publisher → Researcher → Writer → Fact Checker → Editor → Visual Director → Production → Content Connector)을 순서대로 돌린다. 사용자가 "NEW BOOK", "새 책 시작", 한 줄 주제 아이디어, 기획보고서 파일, 또는 이미 쓰여진(반쯤 완성된) 원고를 줄 때 사용한다.
 ---
 
 # New Book
 
-HannaK Ebook Team의 오케스트레이션 스킬. 아이디어 하나 또는 기획보고서 하나를 받아서 완성된 책까지 파이프라인을 순서대로 진행한다.
+HannaK Ebook Team의 오케스트레이션 스킬. 아이디어 하나, 기획보고서, 또는 이미 쓰여진 원고를 받아서 완성된 책까지 파이프라인을 진행한다. 입력 형태에 따라 파이프라인의 어느 단계부터 시작할지가 달라진다.
 
 ## 입력 형태 판별 (가장 먼저 할 일)
 
 사용자가 이번에 준 것이 다음 중 무엇인지 확인한다:
 
-- **한 줄 아이디어**: "OO 주제로 책 하나 만들자" 같은 짧은 문장뿐이고, 별도로 첨부된 기획 문서가 없다.
-  → Publisher 서브에이전트를 **모드 A**로 호출 (`.claude/agents/publisher.md` 참고).
-- **기획보고서 첨부**: 사용자가 파일을 첨부했거나, 이미 만들어진 기획서 텍스트를 통째로 붙여넣었다.
-  → Publisher 서브에이전트를 **모드 B**로 호출한다. 이 경우 Publisher는 새로 기획하지 않고 기존 보고서를 표준 포맷으로 옮기기만 한다는 점을 호출 프롬프트에 명시한다.
+- **한 줄 아이디어**: "OO 주제로 책 하나 만들자" 같은 짧은 문장뿐이고, 별도로 첨부된 기획 문서나 원고가 없다.
+  → Publisher 서브에이전트를 **모드 A**로 호출 (`.claude/agents/publisher.md` 참고). **파이프라인 1단계(Publisher)부터 시작.**
+- **기획보고서 첨부**: 사용자가 파일을 첨부했거나, 이미 만들어진 기획서 텍스트를 통째로 붙여넣었다. 아직 챕터 원고는 없다.
+  → Publisher 서브에이전트를 **모드 B**로 호출한다. 이 경우 Publisher는 새로 기획하지 않고 기존 보고서를 표준 포맷으로 옮기기만 한다는 점을 호출 프롬프트에 명시한다. **파이프라인 1단계(Publisher)부터 시작, 이후 정상 진행.**
+- **반쯤 완성된 원고 첨부**: 사용자가 이미 챕터 일부 또는 전부를 직접(혹은 다른 도구로) 써서 준다.
+  → **Writer 단계를 건너뛰고 Fact Checker부터 파이프라인에 편입**한다. 아래 "기존 원고 편입 절차" 참고.
 
-어느 쪽인지 애매하면, 새로 만들지 말고 사용자에게 "이미 만들어둔 기획서가 있는지" 먼저 확인한다.
+어느 쪽인지 애매하면, 새로 만들지 말고 사용자에게 "이미 만들어둔 기획서나 원고가 있는지" 먼저 확인한다.
 
-## 진행 순서
+## 기존 원고 편입 절차 (반쯤 완성된 원고를 받은 경우)
+
+1. **프로젝트 식별**: 기존에 진행 중이던 `books/<slug>/`가 있으면 그 프로젝트에 이어붙인다. 없으면(완전히 새 책인데 원고부터 있는 경우) 먼저 프로젝트 폴더를 만들고, `00-brief.md`가 없으면 Publisher를 호출해 기획서부터 만든다(제목/목차/독자층 등은 원고 내용에서 역으로 추론하되, 불확실한 항목은 사용자에게 확인).
+2. **원고 저장**: 받은 챕터를 있는 그대로 `books/<slug>/02-chapters/<chapter-number>-<chapter-slug>.md`에 저장한다 (Writer가 쓴 것과 동일한 위치 — Writer는 건너뛴다). 원본 그대로도 참고용으로 남기고 싶으면 별도 보관.
+3. **Fact Checker는 항상 실행**: 사용자가 직접 썼든 Writer가 썼든 관계없이, 이 챕터들도 똑같이 Fact Checker로 독립 검증한다. "사용자가 썼으니 믿을 만하다"고 건너뛰지 않는다.
+4. **빠진 챕터 확인**: `00-brief.md`의 목차와 대조해서 아직 안 쓰인 챕터가 있으면, 그 챕터들만 정상 순서(Researcher → Writer → Fact Checker)로 진행한다.
+5. 이후부터는 전체 챕터(기존 원고 + 새로 쓴 챕터)를 모아 Editor → Visual Director → Production → Content Connector로 정상 진행한다.
+
+## 진행 순서 (처음부터 시작하는 경우)
 
 1. **프로젝트 폴더 준비**: 주제를 영문 kebab-case로 slug화해서 `books/<slug>/`를 만든다. `templates/`에서 카테고리에 맞는 템플릿(culture/history/biography/travel/food)을 고른다 — 모드 B라면 기획보고서에 이미 명시된 카테고리를 우선한다.
 2. **Publisher** 호출 (모드 A 또는 B) → `books/<slug>/00-brief.md` 생성 → 사용자에게 보여주고 승인받는다.
