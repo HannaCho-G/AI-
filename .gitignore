@@ -1,0 +1,13 @@
+# Uploader automation secrets — never commit real credentials or live sessions
+automation/uploader/.env
+automation/uploader/.auth/
+automation/uploader/**/*.session.json
+
+# Node / Python tooling used by uploader scripts
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# OS/editor noise
+.DS_Store

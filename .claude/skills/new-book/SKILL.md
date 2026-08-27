@@ -1,6 +1,6 @@
 ---
 name: new-book
-description: 새 전자책 프로젝트를 시작하거나 기존 프로젝트를 이어서 HannaK Ebook Team 파이프라인(Publisher → Researcher → Writer → Fact Checker → Editor → Visual Director → Production → Content Connector)을 순서대로 돌린다. 사용자가 "NEW BOOK", "새 책 시작", 한 줄 주제 아이디어, 기획보고서 파일, 또는 이미 쓰여진(반쯤 완성된) 원고를 줄 때 사용한다. 반쯤 완성된 원고에 목표 분량(페이지/단어수)이 함께 주어지면 Writer의 증강 모드로 그 분량까지 확장한다.
+description: 새 전자책 프로젝트를 시작하거나 기존 프로젝트를 이어서 HannaK Ebook Team 파이프라인(Publisher → Researcher → Writer → Fact Checker → Editor → Visual Director → Production → Uploader → Content Connector)을 순서대로 돌린다. 사용자가 "NEW BOOK", "새 책 시작", 한 줄 주제 아이디어, 기획보고서 파일, 또는 이미 쓰여진(반쯤 완성된) 원고를 줄 때 사용한다. 반쯤 완성된 원고에 목표 분량(페이지/단어수)이 함께 주어지면 Writer의 증강 모드로 그 분량까지 확장한다.
 ---
 
 # New Book
@@ -31,7 +31,7 @@ HannaK Ebook Team의 오케스트레이션 스킬. 아이디어 하나, 기획�
      b. **Writer를 증강(모드 2)으로 호출** — 기존 원고 + 리서치 + 목표 분량을 넘겨서 확장한다. Writer는 원문을 재작성하지 않고, 사실 근거가 있는 내용만 덧붙인다는 점을 호출 프롬프트에 명시한다.
 4. **Fact Checker는 항상 실행**: 사용자가 직접 썼든 Writer가 썼든, 증강 전이든 후든 관계없이 이 챕터들도 똑같이 Fact Checker로 독립 검증한다. "사용자가 썼으니 믿을 만하다"고 건너뛰지 않는다 — 원문과 증강분 모두 검수 대상이다.
 5. **빠진 챕터 확인**: `00-brief.md`의 목차와 대조해서 아직 안 쓰인 챕터가 있으면, 그 챕터들만 정상 순서(Researcher → Writer 모드 1(신규 집필) → Fact Checker)로 진행한다.
-6. 이후부터는 전체 챕터(기존 원고 + 증강된 원고 + 새로 쓴 챕터)를 모아 Editor → Visual Director → Production → Content Connector로 정상 진행한다.
+6. 이후부터는 전체 챕터(기존 원고 + 증강된 원고 + 새로 쓴 챕터)를 모아 Editor → Visual Director → Production → Uploader → Content Connector로 정상 진행한다.
 
 ## 진행 순서 (처음부터 시작하는 경우)
 
@@ -43,7 +43,8 @@ HannaK Ebook Team의 오케스트레이션 스킬. 아이디어 하나, 기획�
 6. 검증된 챕터를 **Editor** 호출 → `books/<slug>/04-edited/`.
 7. **Visual Director** 호출 → `books/<slug>/05-visuals.md`.
 8. **Production** 호출 → `books/<slug>/06-production/` (합본 원고, 표지 브리프, 프로덕션 노트).
-9. **Content Connector** 호출 → `books/<slug>/07-cross-sell.md` + 최상위 `books/CROSS-SELL-MAP.md` 갱신.
+9. **Uploader** 호출 → 어느 플랫폼에 올릴지 사용자에게 먼저 확인 → `books/<slug>/07-upload/`에 플랫폼별 제출 기록/상태 저장. **최종 Publish/제출 버튼을 누르기 전에는 반드시 제목·가격·카테고리·파일 목록을 사용자에게 보여주고 확인받는다** (`.claude/agents/uploader.md`의 안전 원칙 참고).
+10. **Content Connector** 호출 → `books/<slug>/08-cross-sell.md` + 최상위 `books/CROSS-SELL-MAP.md` 갱신.
 
 ## 중간 승인 원칙
 
@@ -55,4 +56,4 @@ Writer 단계는 챕터 수만큼 반복 호출된다는 것을 항상 염두에
 
 ## 팀 재사용
 
-이 스킬은 책마다 새로 만들어지지 않는다. `.claude/agents/`의 8개 에이전트는 고정이고, 책마다 `books/<slug>/`만 새로 생긴다. "NEW BOOK: <주제>" 또는 기획보고서 첨부만으로 다음 책을 바로 생산라인에 넣을 수 있어야 한다.
+이 스킬은 책마다 새로 만들어지지 않는다. `.claude/agents/`의 9개 에이전트는 고정이고, 책마다 `books/<slug>/`만 새로 생긴다. "NEW BOOK: <주제>" 또는 기획보고서 첨부만으로 다음 책을 바로 생산라인에 넣을 수 있어야 한다.
