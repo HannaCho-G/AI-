@@ -36,14 +36,19 @@ model: sonnet
 
 ## 이미지 스타일 원칙 (모든 프롬프트에 공통 적용)
 
-사용자가 명시적으로 싫어하는 것: 전형적인 "AI가 만든 도표/인포그래픽" 느낌 — 불필요한 그라디언트, 네온/글로우 효과, 어색한 3D 아이콘, 맥락 없는 장식 아이콘, 과도한 텍스트가 이미지 안에 깨진 글자로 들어가는 것.
+**피해야 할 두 극단이 있다** — 반대쪽으로 과하게 가면 그것도 실패다:
 
-원하는 것: **한눈에 보고 바로 이해되는 스타일** — 정보 위계가 명확하고, 여백이 있고, 실제 출판물/매거진 인포그래픽(예: 내셔널지오그래픽, 잡지 explainer 그래픽) 같은 절제된 편집 디자인.
+1. **전형적인 "AI가 만든 도표" 느낌**: 불필요한 그라디언트, 네온/글로우 효과, 어색한 3D 아이콘, 맥락 없는 장식 아이콘, 과도한 텍스트가 깨진 글자로 들어가는 것.
+2. **"클로드/AI 어시스턴트 아티팩트" 느낌**: 파스텔톤 일색, 색을 거의 안 쓴 흑백/무채색에 가까운 배색, 여백을 과하게 남겨서 밋밋하고, 눈에 잘 안 들어오고 심심한 것. "AI 티를 빼자"고 무채색·미니멀로만 가면 이렇게 된다 — 이것도 실패다.
+
+**원하는 것**: 실제 출판된 매거진/여행 가이드북 인포그래픽처럼 **색을 과감하게 쓰면서도 정보가 한눈에 딱 들어오는 스타일**. 예시 레퍼런스: 내셔널지오그래픽 지도/다이어그램, 모노클(Monocle) 매거진 그래픽, 프리미엄 여행 가이드북(론리플래닛 하이엔드 에디션류)의 인포그래픽, 이코노미스트 데이터 그래픽 — 이런 것들은 색감이 확실하고 타이포그래피에 힘이 있으면서도 정보 위계는 깔끔하다.
 
 프롬프트에는 이 원칙을 다음과 같은 문장으로 명시한다 (예시):
-> "Clean editorial infographic style, like a print magazine explainer graphic. Flat design, no gradients, no neon glow, no 3D bevels, minimal color palette (2-3 colors max matching [브랜드 톤]), generous white space, clear single focal point, avoid decorative icons unrelated to the content, avoid embedding dense text inside the image — keep any in-image text extremely minimal and large enough to read."
+> "Bold, vivid editorial infographic style like a premium travel magazine or National Geographic graphic — NOT a flat pastel minimalist AI-assistant style, NOT a gaudy neon/gradient AI-generated look. Use confident, saturated accent colors (matching [브랜드 톤]) with strong contrast, not muted pastels. Strong typographic hierarchy with bold headline treatment. Clear single focal point, purposeful use of color blocks or illustration to create visual interest — avoid excessive empty white space and avoid decorative icons unrelated to the content. No gradients, no neon glow, no 3D bevels. Keep any in-image text extremely minimal and large enough to read."
 
 이미지 안에 정확한 문자/숫자가 많이 들어가야 하는 경우(표, 타임라인 라벨 등)는 AI 생성이 아니라 "분류 3"으로 처리해서 실제 제작을 권장한다.
+
+이 스타일 판단이 실제로 맞는지는 매번 확신하기 어려우니, 처음 몇 개 프롬프트로 생성한 결과를 사용자에게 보여주고 "이 방향 맞아?" 확인받은 뒤 나머지 프롬프트 톤을 거기에 맞춰 조정한다.
 
 ## 출력 형식 (`books/<slug>/05-visuals.md`)
 ```
