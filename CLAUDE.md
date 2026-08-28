@@ -24,8 +24,8 @@ Claude Code를 지휘자로 삼아 전자책을 기획→조사→집필→검�
 | 3 | Writer | `.claude/agents/writer.md` | 챕터 단위 집필 (한 번에 전체 원고 X) |
 | 4 | Fact Checker | `.claude/agents/fact-checker.md` | Writer와 독립적으로 사실검증, CONFIRMED/NEEDS REVIEW/UNSUPPORTED 태깅 |
 | 5 | Editor | `.claude/agents/editor.md` | 중복제거, 흐름, 외국인 독자 기준 문장 다듬기, 문체 통일 |
-| 6 | Visual Director | `.claude/agents/visual-director.md` | 챕터별 시각자료(사진/비교표/타임라인/지도) 계획 |
-| 7 | Production | `.claude/agents/production.md` | 원고 → EPUB/PDF, 목차/페이지번호/표지/내부링크/참고자료 |
+| 6 | Visual Director | `.claude/agents/visual-director.md` | 챕터별 시각자료(사진/비교표/타임라인/지도) 계획 + AI 생성 프롬프트 작성 |
+| 7 | Production | `.claude/agents/production.md` | 원고 → EPUB/PDF, 목차/페이지번호/표지/내부링크/참고자료, 전달받은 실제 이미지 배치 |
 | 8 | Uploader | `.claude/agents/uploader.md` | 완성된 전자책을 실제 판매 플랫폼(KDP/Gumroad/Whop/Etsy/eBay 등)에 브라우저 자동화로 업로드·제출 |
 | 9 | Content Connector | `.claude/agents/content-connector.md` | 기존 책들과의 교차판매/연관 콘텐츠 매핑 |
 
@@ -65,8 +65,9 @@ Publisher → Researcher → Writer → Fact Checker → Editor → Visual Direc
 02-chapters/             # Writer 산출물 (챕터별 .md, 한 파일 = 한 챕터)
 03-factcheck/            # Fact Checker 리포트 (챕터별, CONFIRMED/NEEDS REVIEW/UNSUPPORTED)
 04-edited/                # Editor가 다듬은 최종 원고 (챕터별)
-05-visuals.md             # Visual Director의 시각자료 계획
+05-visuals.md             # Visual Director의 시각자료 계획 (이미지 ID, 위치, AI 생성 프롬프트 포함)
 06-production/            # Production 산출물 (EPUB/PDF, 표지 등 실제 파일은 여기)
+06-production/images/      # 사용자가 만들어서 전달한 실제 이미지 파일 (05-visuals.md의 이미지 ID로 매칭)
 07-upload/                # Uploader의 플랫폼별 제출 기록/상태 (실제 리스팅 URL 포함)
 08-cross-sell.md          # Content Connector의 연관 콘텐츠 맵
 ```
