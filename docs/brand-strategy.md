@@ -17,7 +17,7 @@
 | 콘텐츠 축 | 상태 | 비고 |
 |---|---|---|
 | Korean Food (4.1) | **진행중** | 이미 진행 중인 축 — 한식 본편 1~7 등 기존 콘텐츠 보유 |
-| Korean Culture (4.2) | **진행중** | 이미 진행 중인 축 — Korean Culture 본편 1~6 등 기존 콘텐츠 보유 |
+| Korean Culture (4.2) | **진행중** | 이미 진행 중인 축 — Korean Culture 본편 1~6 등 기존 콘텐츠 보유. 본편 제1편 *Korea's Family Transformation*(가족/젠더/인구구조)이 `books/korea-family-transformation/`에서 파이프라인 진행 중 |
 | Korean Travel (5) | 대기 | 로드맵 1단계 완료 후 2단계에서 병행 착수 예정 |
 | Korean History / Great Koreans / Beauty / Education / Lifestyle | 대기 | 로드맵 4단계(고신뢰 분야 확장)에서 착수 |
 

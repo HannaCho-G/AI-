@@ -7,10 +7,12 @@
 - **부제**: Confucian Legacies, Legal Reform, and Gendered Change in Modern South Korea
 - **한 줄 소개**: An illustrated analytical ebook for international readers
 
-## 브랜드 축 / 콘텐츠 유형 — ⚠️ 확인 필요
-`docs/brand-strategy.md` 기준 8개 축(Food/Culture/History/Great Koreans/Beauty/Education/Lifestyle/Travel) 중 어디에도 "가족/젠더/인구구조"를 정확히 짚는 축은 없다. 가장 가까운 것은 **Korean Culture**(생활문화) 또는 **Korean Education & Lifestyle**(사회 구조) 축이지만, 이 원고는 그 두 축보다 훨씬 학술적/분석적인 톤이라 Culture 본편(입문형)과는 결이 다르다. → **스페셜 에디션으로 분류하고, 향후 "Korean Family/Society"라는 새 하위 결로 브랜드 전략 문서에 추가할지는 사용자 확인 필요.**
+## 브랜드 축 / 콘텐츠 유형
+사용자 확인: **Korean Culture 본편, 제1편(1권)**.
 
-원고 자체에서 "Book 2"라는 표현이 반복 등장한다 (예: "Theoretical Approach, Scope, and Structure of Book 2") — 이게 실제 시리즈의 2권이라는 뜻인지, 초안 작성 과정에서 남은 표현인지 확인 필요.
+⚠️ **번호 불일치 — 확인 필요**: 원고 본문에는 "Theoretical Approach, Scope, and Structure of **Book 2**"처럼 스스로를 "Book 2"라고 지칭하는 표현이 반복 등장한다. 사용자 확인 결과 이 표현은 초안 작성 중 남은 잔재가 아니라 **실제로 이어지는 시리즈의 2권을 가리키는 것**이라고 한다. 그런데 이 책의 공식 카탈로그상 위치는 "Korean Culture 본편 제1편"이다 — 즉 원고 안의 자기지칭(Book 2)과 카탈로그 번호(제1편)가 서로 다르다.
+- Editor 단계에서 원고 안의 "Book 2" 표현을 그대로 둘지, 카탈로그 번호에 맞춰 "Book 1"/"제1편"으로 고칠지는 **사용자가 최종 결정**해야 한다 (임의로 통일하지 않는다).
+- 이게 실제로 이어지는 시리즈의 2권을 가리키는 표현이라면, 그 "1권"(혹은 그 시리즈 자체)이 이 저장소 밖에 있는 것인지, 아니면 앞으로 만들 예정인지도 Content Connector/Publisher가 향후 참고할 수 있게 확인해두면 좋다.
 
 ## 독자층
 - 한국의 가족 제도·젠더 이슈·저출산 등에 관심 있는 **외국인 독자** (원고에 명시: "international readers")
