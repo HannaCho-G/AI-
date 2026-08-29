@@ -1,71 +1,85 @@
 # CHAPTER 4: Women in the Workforce & The Double Burden
 
-By the late 2000s, female higher education enrollment surpassed that of males. Throughout the 2010s and 2020s, the tertiary education attainment rate for young women aged 25 to 34 exceeded 75%, ranking at the top of the OECD. Young women consistently demonstrated parity and often superiority in competitive university admissions, national civil service examinations (Gosi), medical school placements, and bar examinations.
+By the late 2000s, female higher education enrollment surpassed that of males: in 2009, 82.4% of female secondary graduates advanced to university against 81.6% of males, the first reversal on record, after a gap that had narrowed from 7.1 percentage points in 1986 to 0.5 points in 2008 (Statistics Korea / Korean Educational Statistics Yearbook).
+
+Attainment is a different measure from enrollment, and it tells the same story more emphatically. As of 2023, 77% of Korean women aged 25 to 34 held a tertiary qualification, against 63% of men; the corresponding OECD averages were 54% and 41%.[5] Women overtook men on this measure in 2006, the two having been level at 51% each in 2005, and both having stood far lower in 1997 (women 27%, men 35%). Measured without separating the sexes, Korea's 25–34 tertiary attainment rate of 71% is the highest in the OECD, against an OECD average of 48%.[4] The combined figure and the female-only figure are not in conflict; they have different denominators.
+
+Women now outnumber men in university enrollment and in several professional tracks, accounting for 58.1% of pharmacy entrants and 50.4% of veterinary medicine entrants in the 2025 admissions cycle, and their share of bar examination passes has risen steadily, reaching 47.3% in 2025 (43.6% in 2024). In other high-earning gateways they remain a minority: women were 38.4% of the 2025 entering medical school cohort, up from 34.1% in 2021 but still under a third at several of the most selective universities, and 37.7% of those who passed the level-5 national civil service examination in 2024, though 45.2% in the administrative track and a clear majority in some recruitment units (international trade 72.7%, educational administration 66.7%) against 19.1% in the science and technology track.
+
+The pattern is therefore uneven rather than uniform: Korean women hold a decisive lead in educational attainment while remaining a minority at the entrance to some of the country's best-paid professions.
 
 However, when these credentialed women enter the corporate labor market, they encounter an institutional environment still organized around the 20th-century male-breadwinner framework established during the industrialization era.
 
-While recruitment at entry levels has approached parity, female retention and advancement deteriorate sharply over the life course. South Korea persistently registers an OECD-leading gender wage gap of approximately 29% (2023-2024), alongside single-digit female representation on corporate boards and executive committees.
+While recruitment at entry levels has approached parity, female retention and advancement deteriorate sharply over the life course. South Korea has registered the largest gender wage gap in the OECD every year since joining the organization in 1996: approximately 29% in 2023–2024 (29.3% in 2023, 29.0% in 2024) against an OECD average of about 11%, and down from 34.1% in 2018. The OECD defines this indicator as the difference between male and female median earnings relative to male earnings, calculated on unadjusted gross earnings of full-time wage and salary workers.[3] The definition matters for the argument that follows: because the measure excludes part-time employment, it leaves out precisely the segment in which many re-entering women are concentrated.
+
+Female representation in senior corporate positions is low, but it is not uniform across position types. Women held 7.3% of corporate executive posts in 2024 (7.0% in 2023) and 3.2% of inside directorships at affiliates of the thirty largest business groups. Female outside directors at the hundred largest companies by revenue, by contrast, rose from 7.9% in 2020 to 24.2% in 2024 (110 of 454), following the capital-market law amendment requiring board gender diversity at listed firms with assets above two trillion won. Observers have read the divergence as evidence that firms satisfy the mandate through non-executive board appointments rather than through the executive pipeline; that reading is an interpretation of the pattern, not a measured finding.
 
 ### 4.2 Deconstructing the Korean Female M-Curve and Career Interruption (Gyeongdan)
 
-In most advanced industrial economies, female labor force participation across the life cycle follows an Inverted-U Curve: women enter the workforce in their early twenties, maintain steady employment through their thirties and forties due to state-supported childcare and flexible work options, and gradually retire in their late fifties or sixties.
+In most advanced industrial economies, female labor force participation across the life cycle follows an Inverted-U Curve: women enter the workforce in their early twenties, maintain comparatively high employment through their thirties and forties, and withdraw gradually in their late fifties or sixties. Comparative labor economists commonly relate the difference in curve shape to childcare provision and working-time flexibility, but national profiles vary widely and the causal weight of any single institution is contested rather than settled.
 
 In South Korea, female labor force participation historically formed a pronounced M-Curve, characterized by a deep dip during prime childbearing and child-rearing years.
 
-- The Exit Phase (Ages 30–39): Gyeongdan-nyeo
-As women enter their early thirties, marriage, childbirth, and early child care trigger widespread departures from the formal labor market. This institutional exit is captured by the sociological term Gyeongdan-nyeo (경단녀, Career-Interrupted Women).
+That dip remains visible, but it has narrowed sharply. Employment among women aged 30 to 34 rose from 56.7% in 2013 to 71.3% in 2023, the largest increase of any age group, and among women aged 35 to 39 from 54.4% to 64.7% over the same period. The employment gap between men and women in their thirties fell from 39.0 percentage points in 2000 to 16.7 points in 2023, approaching the OECD average (Statistics Korea, employment rates by age). The number of career-interrupted married women fell by 34.9% between 2015 and 2023, to 1.349 million (Ministry of Gender Equality and Family, Statistics on Women's Lives, 2024). The M-curve of the 2000s has flattened without disappearing, and the analysis below should be read as describing a weakening pattern rather than a fixed one.
 
-This exit is driven not by personal preference for domesticity, but by institutional barriers: rigid working hours, lack of flexible scheduling, career penalties for taking parental leave, and the absence of dependable infant care networks.
+- The Exit Phase (Ages 30–39): Gyeongdan-nyeo
+As women enter their early thirties, marriage, childbirth, and early child care remain the reasons most frequently recorded for departure from the formal labor market, and the age profile of employment still dips in these years even as the dip has become shallower. This exit is captured by the sociological term Gyeongdan-nyeo (경단녀, Career-Interrupted Women).
+
+Sociological research on career interruption attributes the exit primarily to institutional constraints rather than to a preference for domesticity, pointing to rigid working hours, limited flexible scheduling, career penalties associated with parental leave, and thin provision of dependable infant care. This attribution is an interpretation, not a measured result: official statistics record the reasons respondents state for leaving work — child care, marriage, pregnancy and childbirth — and separating preference from constraint requires research designs that go beyond descriptive tabulation. [NEEDS RESEARCH: 경력단절 사유별 구성비(통계청/여성가족부 최신 조사) 원표, 그리고 선호와 제약을 분리하려 시도한 인과 연구 1~2건 — 이 문단의 각주로 쓸 것]
 
 - The Re-Entry Phase (Ages 40+): Downward Occupational Mobility
-When women attempt to re-enter the labor market in their late thirties or forties after their children enter primary school, the labor market exhibits extreme dualism:
+When women attempt to re-enter the labor market in their late thirties or forties after their children enter primary school, the labor market exhibits marked dualism:
 
-The corporate tenure track and managerial promotion ladders are closed to those with career gaps.
+The corporate tenure track and managerial promotion ladders are largely closed to those with career gaps.
 
-Re-entry occurs predominantly through non-standard, part-time, temporary, or low-wage service sector employment.
+Re-entry occurs disproportionately through non-standard, part-time, temporary, or low-wage service sector employment. Women made up 19.0% of workers earning less than two-thirds of the median wage in 2023, against 9.8% of men, although the female share has fallen by 12.7 percentage points since 2015 (Ministry of Gender Equality and Family, 2024). [NEEDS RESEARCH: 여성가족부 「경력단절여성 등의 경제활동실태조사」의 재취업 고용형태 구성비 — "재진입이 주로 비정규·시간제로 이루어진다"를 직접 뒷받침할 표와 연도]
 
-Highly qualified former professionals frequently return to work as contract administrative assistants, service workers, or hourly tutors.
+Qualitative studies and case reports describe highly qualified former professionals returning to work as contract administrative assistants, service workers, or hourly tutors. These are illustrative examples rather than a measured distribution.
 
-This structural trajectory depresses women's lifetime earnings, creates long-term economic dependence, and drives high poverty rates among elderly women in their post-retirement years.
+This structural trajectory depresses women's lifetime earnings, creates long-term economic dependence, and carries into old age. The relative poverty rate among elderly women stands at 43.2% against 31.8% for elderly men, a gap that widened from roughly 8 percentage points in 2011 to about 12 points; Korea has recorded the highest elderly poverty rate in the OECD since 2009, at approximately 40% for those aged 66 and over, against a national relative poverty rate of 14.9%. Fewer than 40% of contributory public pension recipients aged 65 and over are women, although women make up 56% of that age group, and the OECD traces this shortfall to employment-duration and wage differences accumulated during working life (OECD, Pensions at a Glance 2025: Korea).
 
 ### 4.3 Intensive Motherhood, Hagwon Logistics, and the Domestic Imbalance
 
-Why do educated women leave the workforce despite their financial investments in higher education? Sociological research points directly to the Double Burden (Ijung-budam, 이중부담): the expectation that women perform as full-time professional earners while retaining primary responsibility for domestic management, elder care, and child-rearing.
+Why do educated women leave the workforce despite their financial investments in higher education? Sociological research points to the Double Burden (Ijung-budam, 이중부담): the expectation that women perform as full-time professional earners while retaining primary responsibility for domestic management, elder care, and child-rearing.
 
 Time-Use Inequality in Dual-Earner Households
-Data from national time-use surveys conducted by Statistics Korea demonstrates that even in dual-earner households where both partners work full-time, women perform roughly three to four times more unpaid domestic labor and childcare daily than their male spouses.
+Statistics Korea's Time Use Survey measures both the imbalance and its recent narrowing. In the 2024 survey, published in 2025, wives in dual-earner households spent 3 hours 32 minutes a day on unpaid household and care work against 1 hour 24 minutes for husbands, a ratio of about 2.5 to one. Five years earlier, in the 2019 survey, the figures were 3 hours 7 minutes and 54 minutes, a ratio of roughly 3.5 to one. The absolute difference narrowed from 2 hours 38 minutes to 2 hours 8 minutes, but the narrowing owed as much to wives doing less (−17 minutes) as to husbands doing more (+13 minutes). Two definitional cautions apply: the survey's "dual-earner" category is not restricted to households in which both partners work full time, and the 2024 round covers roughly 25,000 household members aged ten and over across 12,750 sample households.
 
-While younger men express ideological support for gender equality, corporate work demands—characterized by long commutes, late-night client engagements, and strict attendance tracking—frequently prevent equal domestic participation.
+Why the residual gap persists is less well measured than the gap itself. The survey evidence that does exist concerns parental leave rather than daily housework: 59.1% of men anticipate some career disadvantage from taking leave, and 71.2% name changing attitudes among colleagues at their own workplace as the first condition for making men's leave workable. Reading these findings as evidence that long commutes, late-night client engagements, and strict attendance tracking directly suppress men's domestic participation is a plausible inference, not a demonstrated causal chain. Attitudes toward gender equality among younger Koreans are a separate question, and Chapter 6 addresses it with the relevant survey material.
 
-The Rise of "Intensive Motherhood" (Mok-dong Mom / Gangnam Mom)
-In South Korea's hyper-competitive education system, mothering evolved from basic physical care into complex managerial labor:
+The Rise of "Intensive Motherhood" (the popular "Mok-dong Mom" and "Gangnam Mom")
+In South Korea's hyper-competitive education system, mothering has been described as evolving from basic physical care into complex managerial labor:
 
 Mothers function as educational project managers, researching competitive private academies (Hagwons), arranging transportation schedules, and tracking curricular shifts.
 
-The social standing of the family is tied to the child's academic performance, turning intensive maternal oversight into a moral and familial imperative.
+The social standing of the family is widely understood to be tied to the child's academic performance, which turns intensive maternal oversight into a moral and familial expectation.
 
-When a dual-earner couple faces the logistical impossibility of balancing corporate workplace demands with the intensive requirements of Korea's educational environment, the lower-earning partner—almost invariably the woman, due to the gender wage gap—faces structural pressure to withdraw from her career.
+"Intensive mothering" is an established concept in the sociology of the family, and there is a substantial research literature on Korean educational fervor; the labels Mok-dong Mom and Gangnam Mom, by contrast, are journalistic shorthand rather than analytical categories, and are used here as popular vocabulary. [NEEDS RESEARCH: intensive mothering 개념의 원출처(예: Sharon Hays)와 한국 교육열 관련 연구 1~2건의 서지 정보 — 각주용]
+
+When a dual-earner couple faces the logistical difficulty of reconciling corporate workplace demands with the intensive requirements of Korea's educational environment, the lower-earning partner — typically, though not invariably, the woman — faces structural pressure to withdraw from her career. The aggregate wage gap makes that outcome more likely across the population; it does not by itself establish the proportion of individual couples in which the wife earns less, which is a household-level statistic. [NEEDS RESEARCH: 맞벌이 가구 중 아내 소득이 남편보다 낮은 가구의 비율 — 가구 단위 소득 비교 통계]
 
 ### 4.4 Policy Interventions, Parental Leave Mandates, and the Implementation Gap
 
 To mitigate this structural bottleneck and reverse declining fertility trends, successive South Korean administrations introduced comprehensive statutory family support policies:
 
-Statutory Parental Leave (Yuk-a Hyu-jik): Employees with children under age eight are legally entitled to up to one year of parental leave per parent, supported by government wage-replacement subsidies.
+Statutory Parental Leave (Yuk-a Hyu-jik): Employees with a child aged eight or younger, or in the second year of primary school or below, are legally entitled to up to one year of parental leave per parent, supported by government wage-replacement benefits. Since February 2025 the entitlement can be extended to eighteen months where each parent takes at least three months.
 
-Paternal Leave Incentives (The "3+3" and "6+6" Schemes): Policy reforms engineered to raise wage-replacement caps when both parents take leave sequentially or concurrently during the child's first year.
+Paternal Leave Incentives (The "3+3" and "6+6" Schemes): Policy reforms engineered to raise wage-replacement caps when both parents take leave, together or separately — within twelve months of birth under the 2022 "3+3" scheme, and within eighteen months under the "6+6" scheme introduced in January 2024, which also extended the enhanced-benefit period from three months to six.
 
-Public Childcare Expansion: State capital investments expanding subsidized public daycare facilities (Gong-lip Eorinigip) to reduce early childhood care costs.
+Public Childcare Expansion: Continued state capital investment in subsidized public daycare facilities (Gong-lip Eorinijip) to reduce early childhood care costs. This is a policy commitment rather than a measured outcome; capacity and take-up figures are not presented here. [NEEDS RESEARCH: 국공립어린이집 시설 수 및 이용률 연도별 수치(보건복지부 보육통계)]
+
+These measures are not without recorded effect. In 2024, 60,117 men took parental leave, an increase of 18.3% on the previous year; men accounted for 29.2% of all leave-takers, the highest share since the series began in 2015, and the male take-up rate reached 10.2%, entering double digits for the first time. The government attributes part of the increase to the "6+6" scheme. The implementation gap described below is therefore a gap that has been narrowing, not a static one.
 
 The Corporate Implementation Gap
-Despite progressive statutory frameworks, a wide gap persists between legal entitlement and workplace reality, particularly within Small and Medium Enterprises (SMEs), which employ over 80% of South Korea's workforce.
+Despite progressive statutory frameworks, a wide gap persists between legal entitlement and workplace reality, particularly within Small and Medium Enterprises (SMEs), which account for roughly 81 to 83% of business employment depending on the reference year and denominator (Ministry of SMEs and Startups, SME Basic Statistics).
 
-The Small Business Resource Deficit: Unlike large conglomerates (Chaebols), SMEs operate with lean staffing models and lack the operational budgets to hire temporary replacements for employees taking parental leave. Requesting extended leave places immediate workloads on direct colleagues, generating intense social friction.
+The Small Business Resource Deficit: Unlike large conglomerates (Chaebols), SMEs operate with lean staffing models and lack the operational budgets to hire temporary replacements for employees taking parental leave, so that requesting extended leave places immediate workloads on direct colleagues. The resulting gap is measurable. In the Ministry of Employment and Labor's work–family balance survey, 55.4% of workplaces with five to nine employees reported that everyone who needs parental leave is able to take it, against 94.1% of workplaces with 300 or more — a difference of 38.7 percentage points. Actual take-up was 7.8% against 55.1%, and the return-to-work rate 67.4% against 89.9%. Women's take-up ranged from 78.6% in government bodies and 61.7% in public institutions down to 29.0% in small workplaces, and take-up by income bracket ranged from 68% in the highest to 16% in the lowest.
 
-The Career Penalty: Employees—particularly men—who utilize statutory parental leaves frequently experience subtle career marginalization upon return, including lateral transfers to non-strategic divisions, lower performance evaluations, or missed promotion cycles.
+The Career Penalty: The available evidence covers anticipated and structural penalties rather than measured outcomes for returning employees. In survey data, 59.1% of men expect some career disadvantage from taking leave, with 33.3% specifically concerned about performance evaluation and promotion and 20.9% about reassignment or loss of position. Separately, 45.6% of workplaces reported that time spent on parental leave does not count toward the service period required for promotion (Ministry of Employment and Labor, work–family balance survey, 2022) — an institutional rule rather than a perception, and the clearest structural basis for missed promotion cycles.
 
-Consequently, young Korean women increasingly perceive marriage, pregnancy, and motherhood not as fulfilling milestones, but as professional risks that endanger their hard-won financial independence and personal autonomy.
+How young Korean women themselves weigh marriage, pregnancy, and motherhood against professional risk is an attitudinal question that employment statistics cannot settle, and the trends do not all run in one direction: career interruption among married women fell by more than a third between 2015 and 2023, employment among women in their early thirties rose to 71.3%, and men's parental leave take-up passed 10% for the first time in 2024, even as the wage gap and the old-age poverty gap held stubbornly wide. [NEEDS RESEARCH: 결혼·출산 필요성 인식의 시계열 조사(통계청 사회조사 결혼 필요성 문항 등) — 최소 두 시점 비교가 가능한 자료]
 
-This calculation forms the structural foundation of the marriage postponement, solo living trends, and fertility declines examined in Chapter 5.
+Chapter 5 takes up marriage postponement, solo living, and fertility decline directly, where attitudinal survey evidence can be brought alongside the demographic record.
 
 ## 4.5 Measuring the double burden without reducing it to a slogan
 
@@ -76,4 +90,3 @@ The M-curve is similarly useful but incomplete. It describes an aggregate age pr
 [FIGURE 7 — FEMALE LABOR-FORCE PARTICIPATION BY AGE | full width | line chart for Korea across at least three years plus OECD comparison if definitions match. Caption: “The M-curve is an aggregate pattern whose depth and shape vary by cohort and employment definition.” Source: Statistics Korea labor-force data and OECD data; state reference years and definitions.]
 
 [FIGURE 8 — UNPAID WORK AND CARE TIME | half page | paired bars by sex and household type. Caption: “Equality in paid employment does not automatically produce equality in unpaid work.” Source: Statistics Korea Time Use Survey; state survey year and sample.]
-
