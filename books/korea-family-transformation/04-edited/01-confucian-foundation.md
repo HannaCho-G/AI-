@@ -141,7 +141,7 @@ This last point is a statement about normative expectation, not about compliance
 
 This collectivistic ethic provided a resilient survival mechanism through centuries of foreign invasions, poverty, and state collapse. When it collided with the hyper-meritocratic, urbanized capitalist economy of the late twentieth and early twenty-first centuries, however, it produced acute structural gridlock — setting the stage for the legal, labor, and demographic transformations examined in the chapters that follow, beginning with the colonial reconstruction of the household in Chapter 2.
 
-## 1.6 Evidence, variation, and the limits of the historical model
+### 1.6 Evidence, variation, and the limits of the historical model
 
 The historical argument requires a qualification. Early Joseon records showing daughters' inheritance, maternal kin connections, or residence near the wife's family do not demonstrate that gender equality existed in a modern sense. Social rank, household wealth, region, marital status, and the distinction between formal entitlement and actual possession all mattered. Nor did the later consolidation of patrilineal norms occur at one identical moment for every community. The safest interpretation is therefore one of directional transformation: over several centuries, a more flexible kinship field was increasingly organized around agnatic descent, male ritual leadership, and the reproduction of the household line.
 

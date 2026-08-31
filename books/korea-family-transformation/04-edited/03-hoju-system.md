@@ -1,6 +1,6 @@
 # CHAPTER 3: The Hoju System & The Architecture of Legal Transformation
 
-## 3.1 Writing the Household Head into Republican Law
+### 3.1 Writing the Household Head into Republican Law
 
 The register assembled by the colonial state between 1909 and 1939, described in Chapter 2, outlived the state that built it. When the Republic of Korea came to draft a civil code of its own in the 1950s, the question was not whether Korea would have its own family law but whether the household-head apparatus inherited from that register would be carried into the law of a constitutional democracy.
 
@@ -8,7 +8,7 @@ During the legislative drafting process, a fierce ideological battle erupted bet
 
 The resulting Civil Act (민법, Act No. 471), promulgated on 22 February 1958 and in force from 1 January 1960, was a deeply compromised framework. While it recognized certain basic civil rights, it formally codified the Hoju system (호주제, 戶主制) into modern statutory law: not inventing the institution, but writing an administrative apparatus inherited from the colonial register into the statute book of a republic. Under this regime, the Hoju (Head of Family) served as the primary legal node through which all family members were registered on the state's household civil-status register (Hojeok, 호적).
 
-## 3.2 Structural Contradictions and Everyday Violence of the Hoju Hierarchy
+### 3.2 Structural Contradictions and Everyday Violence of the Hoju Hierarchy
 
 The statutory mechanics of the Hoju system institutionalized gender discrimination and legal absurdity through Articles 778, 781, 984, and related provisions of the Civil Act.
 
@@ -20,7 +20,7 @@ The statutory mechanics of the Hoju system institutionalized gender discriminati
 
 If a divorced mother remarried and brought her biological children into a new household, the children were legally barred from taking their stepfather's surname and remained entered on their father's register. On the register of her new household, the mother herself could appear only through the category of "cohabitant" (donggeo-in, 동거인) rather than as a parent to her own children—a classification that carried real social stigma and bureaucratic friction in schools and workplaces.
 
-## 3.3 Hollowing Out the Hoju: The 1990 Amendment and the 2005 Constitutional Decision
+### 3.3 Hollowing Out the Hoju: The 1990 Amendment and the 2005 Constitutional Decision
 
 **The 1990 amendment: equality around the head of the family.** Long before the courts intervened, the legislature had already stripped the Hoju of much of its practical substance. The 1990 amendment to the Civil Act (Act No. 4199, passed by the National Assembly on 19 December 1989, promulgated on 13 January 1990, and in force from 1 January 1991) introduced the right to claim division of marital property upon divorce, and placed parental authority (Chin-gwon) and post-divorce custody on a gender-neutral footing anchored in economic contribution and the welfare of the child. It extended legal recognition to maternal-line kin and abolished discrimination in inheritance between sons and daughters, and between children born inside and outside marriage. The same amendment converted household headship from an inheritance-based institution (호주상속) into the weaker "succession to headship" (호주승계), and permitted the eldest son to establish a separate household.
 
@@ -42,7 +42,7 @@ Following the ruling, the National Assembly passed the Civil Act amendment aboli
 
 One element of the old regime survived the February ruling. The paternal-surname rule itself—the first clause of Article 781(1), "a child shall take the surname and ancestral seat of the father"—was not part of the February case. The Court reached it separately on 22 December 2005 (2003Hun-Ga5·6), again by a decision of non-conformity. The dismantling of patrilineal family law therefore proceeded in three steps: the decision of 3 February 2005 on the Hoju provisions, the Civil Act amendment of March 2005, and the decision of 22 December 2005 on the paternal-surname rule.
 
-## 3.4 The 2008 Reforms: Institutional Individualization
+### 3.4 The 2008 Reforms: Institutional Individualization
 
 On 1 January 2008 the traditional Hojeok closed, and civil status came to be recorded for each person individually under the Act on Registration of Family Relations (가족관계의 등록 등에 관한 법률, Act No. 8435). Two instruments took effect together on that date: the amended Civil Act described above, which deleted the Hoju provisions themselves, and the registration act, which replaced the household register with a record kept per person. Together they completed the institutional transition from patriarchal household registration to individualized civil-status registration.
 
@@ -66,7 +66,7 @@ Gender equality in divorce settlements—the right to claim division of marital 
 
 The legal deconstruction of the Hoju system was a major democratic achievement, and it erased patriarchal headship from statutory law. It did not, by itself, dislodge decades of entrenched corporate practice or the household division of labor. As South Korean women achieved full legal equality and unprecedented educational attainment, they collided directly with rigid workplace cultures and intensive domestic expectations—the structural dynamic examined in Chapter 4.
 
-## 3.5 What legal individualization changed—and what it did not
+### 3.5 What legal individualization changed—and what it did not
 
 The abolition of the Hoju system was a major institutional shift because it changed the state's basic unit of family registration. A person no longer needed to appear as a subordinate member of a legally headed household in order to have civil status. The new system also made it possible to limit the disclosure of sensitive family information by separating certificates according to purpose. These changes mattered in schools, workplaces, courts, and everyday interactions with public administration.
 
