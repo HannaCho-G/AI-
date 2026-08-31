@@ -29,7 +29,7 @@ The following figure slots are part of the production plan. Replace each slot wi
 
 Figure | Type | Target placement | Required source note
 
-1 | Conceptual map | Introduction, half page | Author’s synthesis
+1 | Conceptual map | Introduction, half page | Author's synthesis
 
 2 | Historical evidence matrix | Chapter 1, one-third page | Historical studies and archive catalogue
 
@@ -51,11 +51,11 @@ Figure | Type | Target placement | Required source note
 
 11 | Mixed care system | Chapter 5, one-third page | Long-term-care policy sources
 
-12 | Risk allocation matrix | Chapter 6, half page | Author’s analytical framework
+12 | Risk allocation matrix | Chapter 6, half page | Author's analytical framework
 
 13 | Family rights bundle | Chapter 6, full page | Current law versus proposals clearly separated
 
-14 | Adaptive social contract scorecard | Chapter 6, one-third page | Author’s synthesis
+14 | Adaptive social contract scorecard | Chapter 6, one-third page | Author's synthesis
 
 ## Statistical appendix and references
 
@@ -63,44 +63,56 @@ The statistical appendix should reproduce the exact series used in the figures, 
 
 ## Source notes for the revised edition
 
-The historical chapters use legal texts, genealogies, inheritance records, and modern scholarship as different kinds of evidence. The discussion of early Joseon inheritance and genealogy should be read alongside studies that document equal or partible inheritance practices and the inclusion of daughters’ descendants in early genealogical records.[15] [16] These sources support a claim of historical variation and gradual transformation, not a claim that premodern Korea was socially egalitarian.
+The historical chapters use legal texts, genealogies, inheritance records, and modern scholarship as different kinds of evidence. The discussion of early Joseon inheritance and genealogy should be read alongside studies that document equal or partible inheritance practices[17][18][19][20][21][22] and the inclusion of daughters' descendants in early genealogical records.[15][16] These sources support a claim of historical variation and gradual transformation, not a claim that premodern Korea was socially egalitarian.
 
-The legal chapters distinguish the Civil Act, constitutional litigation, and the later family-registration system. The English translation of the Civil Act is provided for reference by the Korean Legislation Research Institute, while the National Human Rights Commission’s contemporaneous account documents the human-rights objections raised against the Hoju system.[6] [7] The final production edition should add the official Constitutional Court decision and Korean-language statutory text alongside these English-language materials.
+The legal chapters distinguish the Civil Act, constitutional litigation, and the later family-registration system. The English translation of the Civil Act is provided for reference by the Korean Legislation Research Institute, while the National Human Rights Commission's contemporaneous account documents the human-rights objections raised against the Hoju system.[6] [7] The final production edition should add the official Constitutional Court decision and Korean-language statutory text alongside these English-language materials.
 
 The demographic chapter uses 0.72 as the 2023 total fertility rate, not as an undated current figure.[5] The 2024 national one-person-household release reports 7.829 million one-person households in 2023, equal to 35.5% of all households; the 2025 release updates the series to 8.045 million in 2024, equal to 36.1% of all households, and both figures are computed on households rather than on dwellings or residential units.[1] Later releases should be treated as updates: the finalized 2025 birth-and-death release (August 2026) reports 254,300 live births and a 6.7% increase from 2024, superseding the earlier provisional figures (254,500; +6.8%) from the February 2026 release.[2]
 
-The labor and education chapters follow the OECD definitions rather than using “gender gap” or “tertiary attainment” as free-floating labels. OECD defines the gender wage gap as the difference between men’s and women’s median earnings relative to men’s median earnings, generally using unadjusted gross earnings of full-time wage and salary workers.[3] The OECD’s 2025 Korea country note reports tertiary attainment for 71% of 25–34-year-olds overall; any female-only estimate above 75% must therefore be accompanied by the relevant gender-specific table and reference year.[4]
+The labor and education chapters follow the OECD definitions rather than using "gender gap" or "tertiary attainment" as free-floating labels. OECD defines the gender wage gap as the difference between men's and women's median earnings relative to men's median earnings, generally using unadjusted gross earnings of full-time wage and salary workers.[3] The OECD's 2025 Korea country note reports tertiary attainment for 71% of 25–34-year-olds overall; any female-only estimate above 75% must therefore be accompanied by the relevant gender-specific table and reference year.[4]
 
 ## References
 
-[1] National Data and Statistics Office, “2024 Statistics of One-person Households,” 9 December 2024 (2023 reference year: 7.829 million one-person households, 35.5% of all households). https://mods.go.kr/board.es?mid=a20101000000&bid=11763&tag=&act=view&list_no=438857&ref_bid= ; and Ministry of Data and Statistics (the agency formerly operating as Statistics Korea), “2025 Statistics of One-person Households,” 9 December 2025 (2024 reference year: 8.045 million one-person households, 36.1% of all households). [NEEDS RESEARCH: 「2025 통계로 보는 1인가구」(2025-12-09)의 영구 URL 또는 KOSIS 통계표 번호. 팩트체크 리포트가 발표일·수치·연령 구성은 확인했으나 인용 가능한 URL은 제시하지 않았다. 아울러 발행 기관 영문명 표기(2024년 이전 자료는 Statistics Korea, 2025년 10월 이후 자료는 Ministry of Data and Statistics)를 [1][2][14] 전체에서 통일할 것.]
+[1] Statistics Korea (now the Ministry of Data and Statistics), "2024 Population and Housing Census (Register-based Census)," 29 July 2025 (reference date 1 November 2024; English-language release; 8.045 million one-person households, 36.1% of all households, denominator computed on households). https://mods.go.kr/board.es?mid=a20108010000&bid=11747&act=view&list_no=439064 ; Statistics Korea, 「2024 통계로 보는 1인가구」 [2024 Statistics of One-person Households], 9 December 2024 (2023 reference year: 7.829 million one-person households, 35.5% of all households). https://mods.go.kr/board.es?mid=a10301010000&bid=10820&act=view&list_no=434103 ; and Ministry of Data and Statistics (MODS), 「2025 통계로 보는 1인가구」 [2025 Statistics of One-person Households], 9 December 2025 (2024 reference year: 8.045 million one-person households, 36.1% of all households). https://mods.go.kr/board.es?mid=a10301010000&bid=10820&act=view&list_no=442130 (Note: Korea's national statistical agency was reorganized on 1 October 2025 — Statistics Korea (통계청), formerly an agency under the Ministry of Economy and Finance, was elevated to the Ministry of Data and Statistics (국가데이터처, MODS) under the Prime Minister. Each publication above is cited under the agency name it held at the date of release; both mods.go.kr and the legacy kostat.go.kr domain resolve these links, but deep links of this board.es/list_no form are board-sequence dependent and should be click-verified again immediately before production.)
 
-[2] National Data and Statistics Office, “Preliminary Results of Birth and Death Statistics in 2025,” 25 February 2026. https://mods.go.kr/board.es?mid=a20108010000&bid=11773&tag=&act=view&list_no=444910&ref_bid=11742,11743,11744,11745,11746,11747,11748,11749,11773,11774,11775,11750
+[2] Ministry of Data and Statistics (MODS), "Preliminary Results of Birth and Death Statistics in 2025," 25 February 2026. https://mods.go.kr/board.es?mid=a20108010000&bid=11773&tag=&act=view&list_no=444910&ref_bid=11742,11743,11744,11745,11746,11747,11748,11749,11773,11774,11775,11750
 
-[3] OECD, “Gender Wage Gap: Definition and Source Dataset.” https://www.oecd.org/en/data/indicators/gender-wage-gap.html
+[3] OECD, "Gender Wage Gap: Definition and Source Dataset." https://www.oecd.org/en/data/indicators/gender-wage-gap.html
 
 [4] OECD, Education at a Glance 2025: Korea, Korea country note. https://www.oecd.org/en/publications/education-at-a-glance-2025_1a3543e2-en/korea_252c9ed2-en.html
 
 [5] OECD, Inclusive and Sustainable Well-being in Korea, 2026, chapter on outcomes by gender, age, and education. https://www.oecd.org/en/publications/inclusive-and-sustainable-well-being-in-korea_a8940343-en/full-report/ensuring-inclusive-and-sustainable-well-being-for-korean-men-and-women-throughout-their-lives-outcomes-by-gender-age-and-education_23e274c3.html
 
-[6] Korean Legislation Research Institute, “Civil Act,” English reference translation. https://elaw.klri.re.kr/eng_service/lawView.do?hseq=61788&lang=ENG
+[6] Korean Legislation Research Institute, "Civil Act," English reference translation. https://elaw.klri.re.kr/eng_service/lawView.do?hseq=61788&lang=ENG
 
-[7] National Human Rights Commission of Korea, “The Hoju System is Unconstitutional and a Violation of Human Rights,” 11 March 2003. https://www.humanrights.go.kr/site/program/board/basicboard/view?currentpage=46&menuid=002002001&pagesize=10&searchcategory=policy&boardtypeid=7003&boardid=7000525
+[7] National Human Rights Commission of Korea, "The Hoju System is Unconstitutional and a Violation of Human Rights," 11 March 2003. https://www.humanrights.go.kr/site/program/board/basicboard/view?currentpage=46&menuid=002002001&pagesize=10&searchcategory=policy&boardtypeid=7003&boardid=7000525
 
-[8] Korean Women’s Development Institute, “Rise of Single-person Households and Direction for Family Policy.” https://eng.kwdi.re.kr/inc/download.do?ut=A&upIdx=102029&no=1
+[8] Korean Women's Development Institute, "Rise of Single-person Households and Direction for Family Policy." https://eng.kwdi.re.kr/inc/download.do?ut=A&upIdx=102029&no=1
 
-[9] Kim, Marie Seong-Hak. “Rites and Rights: Lineage Property and Law in Korea.” L’Atelier du Centre de recherches historiques 22 (2020). DOI: 10.4000/acrh.11667. https://journals.openedition.org/acrh/11667
+[9] Kim, Marie Seong-Hak. "Rites and Rights: Lineage Property and Law in Korea." L'Atelier du Centre de recherches historiques 22 (2020). DOI: 10.4000/acrh.11667. https://journals.openedition.org/acrh/11667
 
 [10] Lee, Sangkuk. "The Impacts of Birth Order and Social Status on the Genealogy Register in Thirteenth- to Fifteenth-Century Korea." Journal of Family History 35, no. 2 (2010): 115–127. https://journals.sagepub.com/doi/10.1177/0363199009357158
 
-[11] 김경숙 (Kim, Kyung-suk). “조선후기 光州 全義李氏家의 재산상속” [The property inheritance practices of the Jeon’eui Yi family of the Gwangju area during the latter half of the Joseon dynasty]. The Review of Korean History (한국사연구) 99 (2010): 111–146. https://journal.kci.go.kr/hksh/archive/articleView?artiId=ART001482849 [NEEDS RESEARCH: 이 논문은 조선 **후기** 한 가문의 분재기 사례연구이므로, 이 책이 논증하는 조선 **초기** 균분상속의 근거로는 시기가 맞지 않는다. 조선 초기 균분상속을 뒷받침하려면 『경국대전』 형전 사천조의 자녀 균분 규정과 15~16세기 분재기(화회문기·별급문기) 연구를 별도로 확보해야 한다.]
+[11] 김경숙 (Kim, Kyung-suk). "조선후기 光州 全義李氏家의 재산상속" [The property inheritance practices of the Jeon'eui Yi family of the Gwangju area during the latter half of the Joseon dynasty]. The Review of Korean History (한국사연구) 99 (2010): 111–146. https://journal.kci.go.kr/hksh/archive/articleView?artiId=ART001482849 (Note: this study documents one lineage's inheritance practices in the later half of the Joseon dynasty, after the shift toward eldest-son concentration was already under way. It is retained here as the source for that later contrast — the movement away from partible inheritance discussed in Chapter 1 — and should not be cited as evidence for early Joseon (fifteenth–sixteenth century) partible inheritance, which the surrounding text discusses. For sources documenting the earlier, equal-inheritance pattern, see [17]–[22].)
 
 [12] OECD, Inclusive and Sustainable Well-being in Korea, 2026. https://www.oecd.org/en/publications/inclusive-and-sustainable-well-being-in-korea_a8940343-en.html
 
 [13] OECD, Education at a Glance 2025. https://www.oecd.org/en/publications/2025/09/education-at-a-glance-2025_c58fc9ae.html
 
-[14] Statistics Korea / National Data and Statistics Office, Population and Household Statistics portal. https://mods.go.kr/menu.es?mid=a20108000000
+[14] Ministry of Data and Statistics (MODS) (formerly Statistics Korea), Population and Household Statistics portal. https://mods.go.kr/menu.es?mid=a20108000000
 
-[15] National Library of Korea, “Having a Glimpse of the Lives of Women in the Past.” https://www.nl.go.kr/EN/contents/EN32701000000.do
+[15] National Library of Korea, "Having a Glimpse of the Lives of Women in the Past." https://www.nl.go.kr/EN/contents/EN32701000000.do
 
-[16] Han, Sangwoo. “The Historical Background of the Popularity of Genealogies in Korea.” Journal of Family History (June 2020). DOI: 10.1177/0363199020928364. https://journals.sagepub.com/doi/abs/10.1177/0363199020928364
+[16] Han, Sangwoo. "The Historical Background of the Popularity of Genealogies in Korea." Journal of Family History (June 2020). DOI: 10.1177/0363199020928364. https://journals.sagepub.com/doi/abs/10.1177/0363199020928364
+
+[17] Deuchler, Martina. The Confucian Transformation of Korea: A Study of Society and Ideology. Cambridge, MA: Harvard-Yenching Institute / Harvard University Asia Center, 1992, chap. 5, "Inheritance." https://www.jstor.org/stable/j.ctt1dnn8zj
+
+[18] Peterson, Mark A. Korean Adoption and Inheritance: Case Studies in the Creation of a Classic Confucian Society. Cornell East Asia Series 80. Ithaca, NY: Cornell University East Asia Program, 1996. https://archive.org/details/koreanadoptionin0000pete
+
+[19] 정긍식 (Jeong, Geung-sik). 「16세기 財産相續과 祭祀承繼의 실태」 [Inheritance and ritual succession in the sixteenth century]. 『古文書硏究』 24 (2004): 1–44 (analysis of approximately 250 sixteenth-century property-division documents). https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001136818
+
+[20] 정긍식. 「16세기 재산상속의 한 실례 — 1579년 權祉 妻 鄭氏 許與文記의 분석」 [A case of sixteenth-century property inheritance: analysis of the 1579 property-grant document (heoyeo-mungi) of the wife of Gwon Ji, née Jeong]. 『서울대학교 法學』 47, no. 4 (2006): 268–302. https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001249733
+
+[21] National Institute of Korean History, Joseon Legal Materials Database — Gyeongguk daejeon [National Code], Hyeongjeon (Penal Code), sacheon (private slaves) article, prescribing division of property among sons and daughters without discrimination by sex: original text and Korean translation. https://db.history.go.kr/joseon/law.do (Note: this article is where Joseon inheritance rules were codified — there was no standalone "inheritance code" — and it remained textually unchanged through the nineteenth-century Daejeon hoetong even as eldest-son-favoring practice diverged from it; the resulting gap between statute and practice is the historical precedent for this book's cultural-lag framework.)
+
+[22] 문숙자 (Mun, Suk-ja). 『조선시대 재산상속과 가족』 [Property Inheritance and Family in the Joseon Dynasty]. Seoul: Kyungin Publishing (경인문화사), 2004.
