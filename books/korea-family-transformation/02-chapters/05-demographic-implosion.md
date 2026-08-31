@@ -77,5 +77,3 @@ The transformation of elder care is not a simple replacement of family by the st
 Filial piety therefore changes meaning rather than disappears. It can involve visits, financial contributions, advocacy within medical systems, digital communication, or arranging professional care. The ethical issue is whether these expectations are voluntary and shared, or whether they are enforced through gendered guilt and inadequate public provision. A democratic welfare state should not abolish intergenerational responsibility; it should prevent responsibility from becoming an unpriced private tax on one category of family member.
 
 [FIGURE 11 — MIXED CARE SYSTEM | one-third page | concentric diagram of household, community, market, and state care. Caption: "Contemporary elder care is a mixed system rather than a complete shift from family to government." Source: author's synthesis and long-term-care policy materials.]
-</content>
-</invoke>
