@@ -26,7 +26,7 @@ This unprecedented acceleration created severe cultural lag—the condition Will
 
 The first sphere moved at extraordinary speed: rapid economic advance, legal democratization, and a historic rise in women's educational attainment. The legal turning point is the clearest illustration. On 3 February 2005 the Constitutional Court ruled the core provisions of the patriarchal Hoju system non-conforming to the Constitution—the system under which every citizen was registered as a member of a household organized around a legally designated head of family, an office that passed down the male line—and the National Assembly amended the Civil Act the following month. The individual family-relations registry that replaced the old household register, however, took effect only on 1 January 2008. Chapter 3 follows that three-year gap in detail.
 
-The second, inertial sphere has moved far more slowly. Corporate labor practices shaped during the industrialization decades—extreme overtime, mandatory after-work drinking (*hoesik*), and the premium placed on visible presence at one's desk—remain broadly intact, and their contested origins are examined in Chapters 2 and 4. So do domestic expectations that place eldercare and child-rearing responsibilities disproportionately on women.
+The second, inertial sphere has moved far more slowly. Corporate labor practices shaped during the industrialization decades—extreme overtime, mandatory after-work drinking (Hoesik, 회식), and the premium placed on visible presence at one's desk—remain broadly intact, and their contested origins are examined in Chapters 2 and 4. So do domestic expectations that place eldercare and child-rearing responsibilities disproportionately on women.
 
 Because institutional and workplace adaptation has lagged behind the rapid educational and legal advance of women, the domestic arena has become a high-risk zone for young adults seeking to protect their economic security and their professional identity.
 
@@ -42,7 +42,7 @@ Chapter 3 takes the law apart, analyzing the statutory mechanics of the Hoju sys
 
 Chapter 4 turns to labor and the double burden: the educational paradox, the mechanics of the female M-curve—the dip in women's employment during the child-rearing years that gives the age profile its shape—and the structural causes of the gender wage gap.
 
-Chapter 5 investigates the demographic implosion: the socio-economic drivers behind the lowest fertility rate in the OECD, the rise of one-person households and of the solo-living culture colloquially called *honjok*, and the transformation of elder care.
+Chapter 5 investigates the demographic implosion: the socio-economic drivers behind the lowest fertility rate in the OECD, the rise of one-person households and of the solo-living culture colloquially called Honjok (혼족), and the transformation of elder care.
 
 Chapter 6 addresses generational fractures and future contracts, analyzing the asymmetric gender anxieties reported by young cohorts, evaluating emerging non-traditional family models, and outlining what an adaptive social contract would require.
 
