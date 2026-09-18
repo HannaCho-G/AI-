@@ -99,6 +99,7 @@ def _env_bool(key: str, default: bool) -> bool:
 # ── 공통 파라미터 ────────────────────────────────────────────
 SYMBOL          = os.environ.get('SYMBOL', 'BTC/KRW')
 TIMEFRAME       = os.environ.get('TIMEFRAME', '15m')   # 2~3일 단위 대응 → 일봉은 너무 느림
+BACKTEST_TIMEFRAME = os.environ.get('BACKTEST_TIMEFRAME', '1d')  # 긴 기간(수년) 백테스트용 별도 타임프레임
 CAPITAL         = _env_float('TRADING_CAPITAL_KRW', 50_000)   # 시드(원금)
 FEE_RATE        = _env_float('FEE_RATE', 0.0005)              # 업비트 수수료 0.05%
 MIN_ORDER_KRW   = 5_000         # 업비트 최소 주문금액 (거래소 고정값)
@@ -230,23 +231,39 @@ class UpbitConnector:
         else:
             logger.warning("⚠️  API 키 없음 → 시세 조회만 가능 (모의 모드)")
 
-    def fetch_ohlcv(self, limit: int = 150) -> pd.DataFrame:
+    def fetch_ohlcv(self, limit: int = 150, timeframe: Optional[str] = None) -> pd.DataFrame:
         """
-        최근 캔들 조회. limit<=200이면 단순 단일 호출 (가장 흔한 경우).
-        200개를 넘으면 과거로 페이지네이션.
+        캔들 조회. limit<=200이면 단순 단일 호출 (가장 흔한 경우).
+        200개를 넘으면 과거로 페이지네이션 (긴 백테스트용 — 수천 개도 가능,
+        단 Upbit API 레이트리밋 때문에 호출 횟수만큼 시간이 걸림).
+
+        timeframe을 지정하면 실거래용 전역 TIMEFRAME(기본 15분봉) 대신 그 값을
+        쓴다 — 5년치 백테스트처럼 긴 기간을 볼 때 15분봉으로 받으면 캔들이
+        17만 개가 넘어가 비현실적이므로, 백테스트는 보통 일봉('1d') 등
+        더 굵은 단위로 따로 받는다.
         """
+        tf = timeframe or TIMEFRAME
         if limit <= 200:
-            batch = self.exchange.fetch_ohlcv(SYMBOL, TIMEFRAME, limit=limit)
+            batch = self.exchange.fetch_ohlcv(SYMBOL, tf, limit=limit)
             all_ohlcv = batch
         else:
-            all_ohlcv, since = [], None
+            # limit이 200을 넘으면 200개씩 여러 번 과거로 훑어서 이어붙인다.
+            # 마지막 구간은 200 단위로 정확히 안 나눠떨어지는 경우가 대부분이라,
+            # 직전 배치와 겹치는 캔들이 섞여 들어온다 — 이걸 중복 제거 없이
+            # 그냥 이어붙이면, 뒤에서 limit개만 자를 때 실제로는 가장 오래된
+            # 구간이 통째로 빠지고 중간 구간이 중복되는 채로 잘릴 수 있다
+            # (타임스탬프 기준 dedup을 여기서 먼저 해야 그 사고를 막는다).
+            all_ohlcv, since, seen_ts = [], None, set()
             while len(all_ohlcv) < limit:
                 batch = self.exchange.fetch_ohlcv(
-                    SYMBOL, TIMEFRAME, since=since, limit=200)
+                    SYMBOL, tf, since=since, limit=200)
                 if not batch:
                     break
-                all_ohlcv = batch + all_ohlcv
-                tf_ms = self.exchange.parse_timeframe(TIMEFRAME) * 1000
+                new_candles = [c for c in batch if c[0] not in seen_ts]
+                for c in new_candles:
+                    seen_ts.add(c[0])
+                all_ohlcv = new_candles + all_ohlcv
+                tf_ms = self.exchange.parse_timeframe(tf) * 1000
                 since = batch[0][0] - (200 * tf_ms)
                 if len(batch) < 200:
                     break
@@ -1305,6 +1322,11 @@ def main():
     parser.add_argument('--status', action='store_true', help='현재 시장 상태 확인')
     parser.add_argument('--once', action='store_true', help='1회 실행 후 종료')
     parser.add_argument('--backtest', action='store_true', help='그리드 백테스트')
+    parser.add_argument('--years', type=float, default=None,
+                        help='백테스트 기간(년). 예: --backtest --years 5. '
+                             '지정하면 일봉(BACKTEST_TIMEFRAME) 기준으로 그만큼 과거 데이터를 받아온다.')
+    parser.add_argument('--days', type=int, default=None,
+                        help='백테스트 기간(일). --years 대신 짧은 기간을 볼 때 사용.')
     parser.add_argument('--interval', type=int, default=180, help='실행 주기(초), 기본 3분')
     parser.add_argument('--confirm-withdrawal', nargs='?', const='__baseline__', default=None,
                         metavar='AMOUNT',
@@ -1406,8 +1428,24 @@ def main():
         return
 
     if args.backtest:
-        logger.info("🧪 그리드 백테스트 시작")
-        df = connector.fetch_ohlcv(limit=1500)
+        # 기간 지정이 없으면 기존처럼 실거래 타임프레임(15분봉) 기준 짧은 구간을 보고,
+        # --years/--days를 주면 백테스트 전용 타임프레임(기본 일봉)으로 길게 받아온다.
+        # 15분봉으로 수년치를 받으면 캔들이 수십만 개라 비현실적이기 때문.
+        if args.years is not None or args.days is not None:
+            days = args.days if args.days is not None else round(args.years * 365)
+            bt_timeframe = BACKTEST_TIMEFRAME
+            candles_per_day = {'1d': 1, '4h': 6, '1h': 24, '15m': 96}.get(bt_timeframe, 1)
+            limit = max(days * candles_per_day, 120)  # 최소 warmup(60)+여유 확보
+            logger.info(f"🧪 그리드 백테스트 시작 ({days}일, {bt_timeframe}봉 {limit}개 요청)")
+            df = connector.fetch_ohlcv(limit=limit, timeframe=bt_timeframe)
+        else:
+            logger.info("🧪 그리드 백테스트 시작 (기본: 실거래 타임프레임 최근 구간)")
+            df = connector.fetch_ohlcv(limit=1500)
+
+        logger.info(f"  받아온 캔들: {len(df)}개 ({df.index[0]} ~ {df.index[-1]})")
+        if len(df) < 120:
+            logger.warning("⚠️  캔들 수가 적어(120개 미만) 백테스트 결과 신뢰도가 낮습니다.")
+
         grid = GridEngine(connector)
         for regime in ['SIDEWAYS', 'TREND_DOWN']:
             result = grid.backtest(df, regime)

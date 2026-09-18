@@ -23,7 +23,7 @@ BTC/KRW 그리드 자동매매 프로그램입니다. `grid_engine.py` 하나로
 | 단계 | 명령 | 확인하는 것 |
 |---|---|---|
 | ① 코드 실행 자체 확인 | `python grid_engine.py --check` | 설정값이 유효한지, 실제 주문은 전혀 안 나감 |
-| ② 백테스트 | `python grid_engine.py --backtest` | 과거 데이터에서 전략이 말이 되는지 |
+| ② 백테스트 | `python grid_engine.py --backtest --years 5` | 과거 데이터에서 전략이 말이 되는지. 기간을 지정하면 일봉으로 자동 전환됨(아래 설명) |
 | ③ 모의(Mock) 몇 시간~하루 | `python grid_engine.py` (API 키 없이) | 그리드 생성/체결/재중심 로직이 실제로 도는지. `--dry-run`과 다르게 이 모드는 실제 "가상매매"를 합니다: 현재가가 매수가 아래로 내려오면 체결로 간주하고 BTC를 보유했다가 매도가에 팔아 손익을 계산합니다 |
 | ④ 실제 API 연결, 주문은 차단 | `python grid_engine.py --dry-run` | 실제 시세·잔고·미체결주문 조회는 되지만 매수/매도/취소/출금은 **절대 전송 안 됨** (로그로만 확인) |
 | ⑤ 소액 실거래 | `.env`에서 `TRADING_CAPITAL_KRW=50000`으로 `python grid_engine.py` | 진짜 5만원으로 실제 체결/재중심/손절이 도는지 |
@@ -73,7 +73,9 @@ python grid_engine.py --status
 python grid_engine.py --once
 
 # 4) 과거 데이터로 그리드 전략 성과 확인
-python grid_engine.py --backtest
+python grid_engine.py --backtest              # 기본: 실거래 타임프레임(15분봉) 최근 구간
+python grid_engine.py --backtest --years 5    # 5년치 (일봉 기준으로 자동 전환)
+python grid_engine.py --backtest --days 90    # 최근 90일치 (일봉 기준)
 
 # 5) 실전/모의 무한 루프 (기본 3분 주기)
 python grid_engine.py
@@ -106,6 +108,32 @@ nohup python3 grid_engine.py > /dev/null 2>&1 &
 - `grid_state.json` — 그리드 현황, 누적 실현손익 (자동 생성)
 - `risk_state.json` — 현재 기준선(시드), 누적 출금액 (자동 생성)
 - `trading.log` — 실행 로그
+
+## 긴 기간(수년) 백테스트
+
+`--backtest`만 쓰면 실거래용 타임프레임(15분봉)의 최근 구간만 봅니다 — 15분봉으로
+5년치를 받으면 캔들이 17만 개가 넘어가 비현실적이기 때문입니다. `--years`나
+`--days`를 지정하면 자동으로 **일봉(`BACKTEST_TIMEFRAME`, 기본 `1d`)** 기준으로
+전환해서 그 기간만큼 받아옵니다:
+
+```bash
+python grid_engine.py --backtest --years 5
+python grid_engine.py --backtest --days 90
+```
+
+업비트 API는 한 번에 최대 200개까지만 주기 때문에, 200개 단위로 여러 번 나눠서
+과거로 훑어가며 받아옵니다(5년치 일봉이면 약 10번). 이 페이지네이션 과정에서
+마지막 구간은 이전 구간과 겹치는 경우가 대부분이라, 겹치는 캔들을 타임스탬프
+기준으로 걸러내고 이어붙입니다 — 이렇게 안 하면 가장 오래된 날짜의 데이터가
+누락된 채로 중간 날짜가 중복되어 잘릴 수 있어서, 실제로 5년치 합성 데이터로
+"받아온 개수가 정확히 맞는지 + 가장 오래된/최근 캔들이 원본과 정확히 일치하는지"
+까지 검증했습니다.
+
+참고: 백테스트(일봉 기준 MA20/MA60 = 20일/60일 이동평균)와 실거래(15분봉 기준
+MA20/MA60 = 5시간/15시간 이동평균)는 같은 레짐 감지 코드를 쓰지만 서로 다른
+시간 단위로 해석됩니다 — 실거래는 2~3일 단위의 빠른 반응을 위해 15분봉을 쓰고,
+장기 백테스트는 일봉 기준 장기 추세를 보는 것이 더 적합하기 때문에 의도적으로
+다르게 뒀습니다.
 
 ## 재시작 시 안전장치 (실거래 전 반드시 확인해야 할 3가지)
 
