@@ -719,6 +719,11 @@ class GridEngine:
         (로컬 상태를 그냥 믿지 않음), 그 주문이 외부(업비트 앱 등)에서 취소된
         경우에도 이미 체결된 부분(partial fill)이 있으면 버리지 않고 매도
         대기열(sell_retry)로 넘겨 회수한다.
+
+        매수 주문이 아직 완전히 체결되지 않고 'open' 상태로 남아있는 동안에도,
+        이미 체결된 부분만으로 최소주문금액을 넘기면 잔여 수량은 취소하고 그
+        체결분을 즉시 매도 대기열로 넘긴다 — 나머지가 언제 다 체결될지 모르는
+        채로 그 BTC를 매도 주문 없이 무기한 방치하지 않기 위함이다.
         """
         for price_key, info in list(self.grid_orders.items()):
 
@@ -751,7 +756,26 @@ class GridEngine:
                     else:
                         logger.info(f"매수주문이 거래소에서 외부적으로 취소됨(체결 없음, ₩{buy_price:,.0f}) → 레벨 제거")
                         del self.grid_orders[price_key]
-                # status == 'open' (부분체결 진행중 포함) → 그대로 대기
+                elif status == 'open' and filled_amt > 0 and filled_amt * current_price >= MIN_ORDER_KRW:
+                    # 아직 전량 체결은 아니지만, 이미 체결된 부분만으로도 매도 주문을
+                    # 낼 수 있는 크기다. 나머지가 언제 다 체결될지 기약 없이 기다리며
+                    # 이 BTC를 매도 주문 없이 방치하지 않고, 잔여 수량은 취소하고
+                    # 지금까지 체결된 만큼만 바로 매도 대기열로 넘긴다.
+                    logger.warning(
+                        f"⚠️  부분체결 감지: 매수 ₩{buy_price:,.0f} 주문이 "
+                        f"{filled_amt:.8f}BTC만 체결된 채 대기 중 → 잔여 수량은 취소하고 "
+                        f"체결분은 즉시 매도 대기열로 전환합니다."
+                    )
+                    confirmed_filled = self.connector.cancel_order(info['order_id'])
+                    if confirmed_filled is None:
+                        logger.error(f"  ❌ 잔여 수량 취소 실패 — 다음 사이클에 재시도합니다.")
+                    else:
+                        # 취소 응답 기준 체결량을 신뢰(직전 조회값과 다를 수 있음 — 그 사이 더 체결됐을 수 있어서)
+                        info['qty'] = confirmed_filled if confirmed_filled > 0 else filled_amt
+                        info['status'] = 'sell_retry'
+                # status == 'open' + 체결량이 아직 최소주문금액 미만 → 그대로 대기
+                # (지금 팔아봤자 최소주문금액 미달로 거부되므로, 더 체결되거나
+                #  재중심/손절로 취소될 때까지는 기다리는 것이 유일한 선택지)
 
             elif info['status'] == 'sell_retry':
                 sell_order = self.connector.place_limit_sell(info['sell_price'], info.get('qty', 0))
