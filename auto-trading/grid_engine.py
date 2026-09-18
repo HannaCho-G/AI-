@@ -168,6 +168,16 @@ def validate_config():
             f"현재 자본(₩{CAPITAL:,.0f})으로는 GRID_LEVELS를 최대 {max_levels}로 "
             f"낮추거나 TRADING_CAPITAL_KRW를 늘리세요."
         )
+    # TREND_DOWN 레짐에서는 자본을 절반으로 줄여서 그리드를 짜므로(build_grid),
+    # 평상시엔 통과해도 하락장 진입 시에만 최소주문금액 밑으로 떨어질 수 있다.
+    downtrend_capital = grid_capital * 0.5
+    downtrend_per_level = downtrend_capital / GRID_LEVELS if GRID_LEVELS > 0 else 0
+    if downtrend_per_level < MIN_ORDER_KRW:
+        problems.append(
+            f"TREND_DOWN(하락 추세) 진입 시 레벨당 금액(₩{downtrend_per_level:,.0f})이 "
+            f"최소주문금액(₩{MIN_ORDER_KRW:,.0f}) 밑으로 떨어집니다. 지금은 통과해도 "
+            f"하락장이 오면 그리드 생성이 막힙니다. GRID_LEVELS를 낮추거나 자본을 늘리세요."
+        )
     if CAPITAL <= 0:
         problems.append("TRADING_CAPITAL_KRW는 0보다 커야 합니다.")
     if not (0 < STOP_LOSS_PCT < 1):
@@ -254,13 +264,25 @@ class UpbitConnector:
         return float(ticker['last'])
 
     def get_balance(self) -> Dict[str, float]:
+        """
+        'KRW'/'BTC'는 지금 당장 새 주문에 쓸 수 있는 자유 잔고(free).
+        'KRW_total'/'BTC_total'은 미체결 주문에 묶인(used) 만큼까지 합친 전체
+        보유량 — 평가자산(equity) 계산은 반드시 이걸 써야 한다. free만 쓰면
+        매수/매도 주문이 걸려 있는 동안 실제로는 잃지 않은 자산을 "없어진 것"
+        처럼 계산해서, 손절/출금 판단이 잘못 트리거될 수 있다.
+        """
         if not self.has_key:
-            return {'KRW': CAPITAL, 'BTC': 0.0}
+            return {'KRW': CAPITAL, 'BTC': 0.0, 'KRW_total': CAPITAL, 'BTC_total': 0.0}
         balance = self.exchange.fetch_balance()
-        return {
-            'KRW': float(balance.get('KRW', {}).get('free', 0)),
-            'BTC': float(balance.get('BTC', {}).get('free', 0)),
-        }
+        krw, btc = balance.get('KRW', {}) or {}, balance.get('BTC', {}) or {}
+        krw_free, btc_free = float(krw.get('free') or 0), float(btc.get('free') or 0)
+        # ccxt 통합 구조는 보통 'total'을 직접 채워주지만(free+used 계산까지 이미 해둠),
+        # 혹시 비어있으면 free+used로 직접 계산해서 보정한다.
+        krw_total = krw.get('total')
+        krw_total = float(krw_total) if krw_total is not None else krw_free + float(krw.get('used') or 0)
+        btc_total = btc.get('total')
+        btc_total = float(btc_total) if btc_total is not None else btc_free + float(btc.get('used') or 0)
+        return {'KRW': krw_free, 'BTC': btc_free, 'KRW_total': krw_total, 'BTC_total': btc_total}
 
     def get_open_orders(self) -> List[dict]:
         """거래소에 현재 실제로 남아있는 미체결 주문 전체 (재시작 시 대조용)"""
@@ -1071,14 +1093,24 @@ class RiskManager:
             }, f, ensure_ascii=False, indent=2)
 
     def get_equity(self, current_price: float) -> float:
+        """
+        평가자산 = 지금 팔면 얼마인가. 실거래(has_key) 모드에서는 반드시
+        'KRW_total'/'BTC_total'(미체결 주문에 묶인 것까지 포함한 실제 보유량)을
+        써야 한다. free만 쓰면 매수/매도 주문이 열려 있는 동안 그만큼을
+        "없어진 자산"처럼 계산해서 손절/출금 판단이 잘못 트리거된다.
+        """
         balance = self.connector.get_balance()
-        btc_qty = balance['BTC'] if self.connector.has_key else self.grid.btc_in_flight()
-        krw = balance['KRW'] if self.connector.has_key else (
-            self.initial_capital - sum(
-                v['amount_krw'] for v in self.grid.grid_orders.values()
-                if v['status'] in ('pending_sell', 'sell_retry')
-            ) + self.grid.realized_pnl
-        )
+        if self.connector.has_key:
+            btc_qty = balance['BTC_total']
+            krw = balance['KRW_total']
+        else:
+            btc_qty = self.grid.btc_in_flight()
+            krw = (
+                self.initial_capital - sum(
+                    v['amount_krw'] for v in self.grid.grid_orders.values()
+                    if v['status'] in ('pending_sell', 'sell_retry')
+                ) + self.grid.realized_pnl
+            )
         return krw + btc_qty * current_price
 
     def check_stop_loss(self, current_price: float, equity: float) -> bool:
@@ -1250,8 +1282,14 @@ def main():
     parser.add_argument('--once', action='store_true', help='1회 실행 후 종료')
     parser.add_argument('--backtest', action='store_true', help='그리드 백테스트')
     parser.add_argument('--interval', type=int, default=180, help='실행 주기(초), 기본 3분')
-    parser.add_argument('--confirm-withdrawal', action='store_true',
-                        help='업비트 앱에서 수동으로 시드를 출금했다면 실행 → 기준선 리셋')
+    parser.add_argument('--confirm-withdrawal', nargs='?', const='__baseline__', default=None,
+                        metavar='AMOUNT',
+                        help='업비트 앱에서 수동으로 시드를 출금한 "뒤에" 실행 → 기준선 리셋. '
+                             '금액을 생략하면 현재 기준선(risk_state.json에 저장된 값)만큼 '
+                             '출금했다고 간주합니다. 실제로 출금한 금액이 다르면 '
+                             '--confirm-withdrawal 45000 처럼 직접 지정하세요. 실행하면 실제로 '
+                             '출금했는지 한 번 더 확인을 물어보며, 이 명령 자체는 출금 여부를 '
+                             '검증하지 않고 사용자의 확인만으로 기준선을 바꿉니다.')
     parser.add_argument('--withdraw-now', type=float, metavar='AMOUNT',
                         help='지정한 금액을 지금 즉시 실제 출금 API로 1회 테스트 실행 (자동루프 없이 단발성)')
     parser.add_argument('--reconcile', action='store_true',
@@ -1298,14 +1336,37 @@ def main():
             print("❌ 출금 요청이 실패했습니다. 위 로그의 확인사항을 먼저 점검하세요.")
         return
 
-    if args.confirm_withdrawal:
+    if args.confirm_withdrawal is not None:
         grid = GridEngine(connector)
         info = MarketAnalyzer.analyze(connector.fetch_ohlcv(limit=150), collect_sentiment=False)
         balance = connector.get_balance()
         initial_capital = min(CAPITAL, balance['KRW']) if connector.has_key else CAPITAL
-        risk = RiskManager(connector, grid, initial_capital)
-        risk.confirm_withdrawal(CAPITAL, info['price'], source='manual')
-        print(f"✅ 수동 출금이 확정되었습니다. 새 기준선: ₩{risk.baseline:,.0f}")
+        risk = RiskManager(connector, grid, initial_capital)  # risk_state.json에서 현재 baseline 복원됨
+
+        if args.confirm_withdrawal == '__baseline__':
+            amount = risk.baseline  # 현재 사이클의 실제 시드 금액 (고정된 CAPITAL이 아님)
+        else:
+            try:
+                amount = float(args.confirm_withdrawal)
+            except ValueError:
+                logger.error(f"❌ 출금 금액을 숫자로 해석할 수 없습니다: {args.confirm_withdrawal!r}")
+                sys.exit(1)
+
+        # 이 명령은 실제로 돈이 빠져나갔는지 확인할 방법이 없다 (수동 출금은
+        # 업비트 앱에서 일어나는 일이라 이 프로그램이 볼 수 없음). 그래서
+        # 실수로 잘못 실행해도 기준선이 조용히 틀어지지 않도록 반드시 되묻는다.
+        print(f"⚠️  ₩{amount:,.0f}을 업비트 앱에서 실제로 출금하셨다는 전제로 기준선을 "
+              f"₩{amount:,.0f}만큼 낮춥니다. 이 프로그램은 실제 출금 여부를 확인할 수 없습니다.")
+        try:
+            answer = input("정말 출금을 완료하셨습니까? 맞으면 yes 입력: ").strip().lower()
+        except EOFError:
+            answer = ''
+        if answer != 'yes':
+            print("취소되었습니다. 아무것도 변경하지 않았습니다.")
+            return
+
+        risk.confirm_withdrawal(amount, info['price'], source='manual')
+        print(f"✅ 수동 출금(₩{amount:,.0f}) 확정. 새 기준선: ₩{risk.baseline:,.0f}")
         return
 
     if args.status:
