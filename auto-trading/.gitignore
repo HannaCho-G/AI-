@@ -1,0 +1,5 @@
+.env
+grid_state.json
+trading.log
+__pycache__/
+*.pyc
