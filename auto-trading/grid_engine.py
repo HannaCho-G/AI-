@@ -119,6 +119,12 @@ WITHDRAW_ALERT_COOLDOWN_SEC = _env_int('WITHDRAW_ALERT_COOLDOWN_SEC', 3600)  # �
 # ── 레짐 파라미터 ────────────────────────────────────────────
 REGIME_PROB_MIN = _env_float('REGIME_PROB_MIN', 0.52)
 
+# ── 드라이런 (실거래 투입 전 4단계용) ──────────────────────────
+# true면 실제 API 키로 시세/잔고/미체결주문은 그대로 조회하지만,
+# 매수/매도/취소/출금 등 "쓰기" 요청은 절대 거래소로 보내지 않고 로그만 남긴다.
+# --dry-run 플래그로도 켤 수 있다 (main()에서 이 값을 덮어씀).
+DRY_RUN = _env_bool('DRY_RUN', False)
+
 STATE_FILE       = os.environ.get('STATE_FILE', 'grid_state.json')
 RISK_STATE_FILE  = os.environ.get('RISK_STATE_FILE', 'risk_state.json')
 LOG_FILE         = os.environ.get('LOG_FILE', 'trading.log')
@@ -206,7 +212,10 @@ class UpbitConnector:
             'enableRateLimit': True,
         })
         self.has_key = bool(access and secret)
-        if self.has_key:
+        self.dry_run = DRY_RUN
+        if self.has_key and self.dry_run:
+            logger.warning("🧪 DRY_RUN 모드 — 실제 API 키로 조회는 하지만 주문/취소/출금은 절대 보내지 않습니다.")
+        elif self.has_key:
             logger.info("✅ API 키 확인 → 실전 주문 가능")
         else:
             logger.warning("⚠️  API 키 없음 → 시세 조회만 가능 (모의 모드)")
@@ -253,6 +262,26 @@ class UpbitConnector:
             'BTC': float(balance.get('BTC', {}).get('free', 0)),
         }
 
+    def get_open_orders(self) -> List[dict]:
+        """거래소에 현재 실제로 남아있는 미체결 주문 전체 (재시작 시 대조용)"""
+        if not self.has_key:
+            return []
+        try:
+            return self.exchange.fetch_open_orders(SYMBOL)
+        except Exception as e:
+            logger.error(f"❌ 미체결 주문 조회 실패: {e}")
+            return []
+
+    def fetch_order(self, order_id: str) -> Optional[dict]:
+        """주문 하나의 최신 상태 조회 (없으면 None, 실패도 None + 로그)"""
+        if not self.has_key or not order_id:
+            return None
+        try:
+            return self.exchange.fetch_order(order_id, SYMBOL)
+        except Exception as e:
+            logger.warning(f"⚠️  주문 상태 조회 실패 ({order_id}): {e}")
+            return None
+
     def place_limit_buy(self, price: float, amount_krw: float) -> Optional[dict]:
         """지정가 매수 주문"""
         if amount_krw < MIN_ORDER_KRW:
@@ -263,6 +292,10 @@ class UpbitConnector:
             order_id = f'mock_buy_{int(time.time()*1000)}_{price:.0f}'
             logger.info(f"[모의] 매수 주문: ₩{price:,.0f} × {qty:.8f}BTC = ₩{amount_krw:,.0f}")
             return {'id': order_id, 'price': price, 'qty': qty, 'side': 'buy', 'status': 'open'}
+        if self.dry_run:
+            logger.info(f"🧪 [DRY-RUN] 매수 주문 생략: ₩{price:,.0f} × {qty:.8f}BTC (실제 전송 안 함)")
+            return {'id': f'dryrun_buy_{int(time.time()*1000)}', 'price': price, 'qty': qty,
+                    'side': 'buy', 'status': 'open'}
         try:
             order = self.exchange.create_limit_buy_order(SYMBOL, qty, price)
             logger.info(f"✅ 매수 주문: ₩{price:,.0f} × {qty:.8f}BTC")
@@ -284,6 +317,10 @@ class UpbitConnector:
             order_id = f'mock_sell_{int(time.time()*1000)}_{price:.0f}'
             logger.info(f"[모의] 매도 주문: ₩{price:,.0f} × {qty:.8f}BTC")
             return {'id': order_id, 'price': price, 'qty': qty, 'side': 'sell', 'status': 'open'}
+        if self.dry_run:
+            logger.info(f"🧪 [DRY-RUN] 매도 주문 생략: ₩{price:,.0f} × {qty:.8f}BTC (실제 전송 안 함)")
+            return {'id': f'dryrun_sell_{int(time.time()*1000)}', 'price': price, 'qty': qty,
+                    'side': 'sell', 'status': 'open'}
         try:
             order = self.exchange.create_limit_sell_order(SYMBOL, qty, price)
             logger.info(f"✅ 매도 주문: ₩{price:,.0f} × {qty:.8f}BTC")
@@ -292,16 +329,31 @@ class UpbitConnector:
             logger.error(f"❌ 매도 주문 실패: {e}")
             return None
 
-    def cancel_order(self, order_id: str) -> bool:
+    def cancel_order(self, order_id: str) -> Optional[float]:
+        """
+        주문 취소. 반환값은 '취소되기 직전까지 이미 체결돼 있던 수량'(float).
+        취소 자체가 실패하면 None을 반환해서 호출부가 "체결량 0"과 "취소 실패"를
+        절대 혼동하지 않게 한다 (부분체결된 BTC를 조용히 잃어버리지 않기 위함).
+        """
         if not self.has_key:
             logger.info(f"[모의] 주문 취소: {order_id}")
-            return True
+            return 0.0  # 모의 모드는 부분체결을 모델링하지 않음
+        if self.dry_run:
+            logger.info(f"🧪 [DRY-RUN] 주문 취소 생략: {order_id}")
+            return 0.0
+        # 취소 전에 먼저 현재까지 체결된 수량을 확인해둔다.
+        filled_qty = 0.0
+        before = self.fetch_order(order_id)
+        if before:
+            filled_qty = float(before.get('filled') or 0)
         try:
             self.exchange.cancel_order(order_id, SYMBOL)
-            return True
         except Exception as e:
             logger.error(f"❌ 주문 취소 실패: {e}")
-            return False
+            return None
+        if filled_qty > 0:
+            logger.warning(f"⚠️  취소 전 이미 부분체결됨: {order_id} → {filled_qty:.8f}BTC (회수 처리)")
+        return filled_qty
 
     def sell_all_market(self, qty: float) -> Optional[dict]:
         """손절선 도달 시 즉시 청산용 시장가 매도"""
@@ -310,6 +362,9 @@ class UpbitConnector:
         if not self.has_key:
             logger.info(f"[모의] 시장가 전량 매도: {qty:.8f}BTC")
             return {'id': f'mock_market_sell_{int(time.time())}', 'qty': qty}
+        if self.dry_run:
+            logger.info(f"🧪 [DRY-RUN] 시장가 전량 매도 생략: {qty:.8f}BTC (실제 전송 안 함)")
+            return {'id': f'dryrun_market_sell_{int(time.time())}', 'qty': qty}
         try:
             order = self.exchange.create_market_sell_order(SYMBOL, qty)
             logger.info(f"✅ 시장가 전량 매도 완료: {qty:.8f}BTC")
@@ -338,6 +393,9 @@ class UpbitConnector:
         if not self.has_key:
             logger.warning("[모의] 출금은 모의 모드에서 지원하지 않습니다 (실제 API 키 필요).")
             return None
+        if self.dry_run:
+            logger.info(f"🧪 [DRY-RUN] 출금 생략: ₩{amount:,.0f} (실제 전송 안 함)")
+            return {'id': f'dryrun_withdraw_{int(time.time())}', 'amount': amount}
         try:
             result = self.exchange.withdraw('KRW', amount, None)
             logger.info(f"🏧 출금 요청 성공: ₩{amount:,.0f} → 등록된 계좌")
@@ -610,6 +668,19 @@ class GridEngine:
         logger.info(f"✅ 그리드 주문 등록: {placed}개")
 
     def _record_trade(self, buy_price, sell_price, qty):
+        """
+        buy_price가 None이면(= 재시작 시 거래소에서 그대로 가져온, 매수단가를
+        모르는 매도포지션) 손익 계산을 하지 않고 매출만 기록한다. 모르는 값을
+        추정해서 realized_pnl에 섞는 것보다, 모른다고 명확히 남기는 쪽이 안전하다.
+        """
+        if buy_price is None:
+            self.trade_log.append({
+                'buy': None, 'sell': sell_price, 'qty': qty,
+                'pnl': None, 'note': '재시작 시 거래소에서 그대로 가져온 주문 — 매수단가 불명, 손익 계산 생략',
+                'at': datetime.now().isoformat(),
+            })
+            logger.warning(f"  ⚠️  매수단가 불명 포지션 매도 완료 (₩{sell_price:,.0f} × {qty:.8f}BTC) — 손익 미집계")
+            return
         pnl = (sell_price - buy_price) * qty - (buy_price + sell_price) * qty * FEE_RATE
         self.realized_pnl += pnl
         self.trade_log.append({
@@ -619,34 +690,46 @@ class GridEngine:
         logger.info(f"  💵 확정손익 ₩{pnl:,.0f} | 누적손익 ₩{self.realized_pnl:,.0f}")
 
     def check_fills_and_place_sells(self, current_price: float):
-        """매수 체결 확인 → 매도 등록 → 매도 체결 확인 → 레벨 회수(재사용 가능하게)"""
+        """
+        매수 체결 확인 → 매도 등록 → 매도 체결 확인 → 레벨 회수(재사용 가능하게).
+
+        실거래 모드에서는 항상 거래소의 실제 주문 상태를 다시 조회해서 판단하고
+        (로컬 상태를 그냥 믿지 않음), 그 주문이 외부(업비트 앱 등)에서 취소된
+        경우에도 이미 체결된 부분(partial fill)이 있으면 버리지 않고 매도
+        대기열(sell_retry)로 넘겨 회수한다.
+        """
         for price_key, info in list(self.grid_orders.items()):
 
             if info['status'] == 'open':
                 buy_price = info['buy_price']
-                filled = False
                 if not self.connector.has_key:
-                    filled = current_price <= buy_price
-                else:
-                    try:
-                        o = self.connector.exchange.fetch_order(info['order_id'], SYMBOL)
-                        filled = (o.get('status') == 'closed')
-                        if filled:
-                            info['qty'] = float(o.get('filled', 0))
-                    except Exception as e:
-                        logger.error(f"매수 주문 상태 확인 실패: {e}")
-
-                if filled:
-                    if 'qty' not in info:
+                    if current_price <= buy_price:
                         info['qty'] = (info['amount_krw'] * (1 - FEE_RATE)) / buy_price
-                    logger.info(f"[체결] 매수 ₩{buy_price:,.0f} × {info['qty']:.8f}BTC")
-                    sell_order = self.connector.place_limit_sell(info['sell_price'], info['qty'])
-                    if sell_order:
-                        info['status'] = 'pending_sell'
-                        info['sell_order_id'] = sell_order.get('id', '')
-                    else:
-                        # 매도 등록 실패 (최소주문금액 미달 등) → 다음 사이클에 재시도
+                        self._on_buy_filled(price_key, info)
+                    continue
+
+                o = self.connector.fetch_order(info['order_id'])
+                if o is None:
+                    continue  # 조회 실패 — 다음 사이클에 재시도, 상태는 건드리지 않음
+                status = o.get('status')
+                filled_amt = float(o.get('filled') or 0)
+
+                if status == 'closed':
+                    info['qty'] = filled_amt if filled_amt > 0 else \
+                        (info['amount_krw'] * (1 - FEE_RATE)) / buy_price
+                    self._on_buy_filled(price_key, info)
+                elif status == 'canceled':
+                    if filled_amt > 0:
+                        logger.warning(
+                            f"⚠️  매수주문이 거래소에서 외부적으로 취소됨(₩{buy_price:,.0f}), "
+                            f"체결분 {filled_amt:.8f}BTC는 회수해서 매도 대기열로 전환합니다."
+                        )
+                        info['qty'] = filled_amt
                         info['status'] = 'sell_retry'
+                    else:
+                        logger.info(f"매수주문이 거래소에서 외부적으로 취소됨(체결 없음, ₩{buy_price:,.0f}) → 레벨 제거")
+                        del self.grid_orders[price_key]
+                # status == 'open' (부분체결 진행중 포함) → 그대로 대기
 
             elif info['status'] == 'sell_retry':
                 sell_order = self.connector.place_limit_sell(info['sell_price'], info.get('qty', 0))
@@ -655,33 +738,221 @@ class GridEngine:
                     info['sell_order_id'] = sell_order.get('id', '')
 
             elif info['status'] == 'pending_sell':
-                sold = False
                 if not self.connector.has_key:
-                    sold = current_price >= info['sell_price']
-                else:
-                    try:
-                        o = self.connector.exchange.fetch_order(info['sell_order_id'], SYMBOL)
-                        sold = (o.get('status') == 'closed')
-                    except Exception as e:
-                        logger.error(f"매도 주문 상태 확인 실패: {e}")
+                    if current_price >= info['sell_price']:
+                        self._record_trade(info.get('buy_price'), info['sell_price'], info['qty'])
+                        del self.grid_orders[price_key]
+                    continue
 
-                if sold:
-                    self._record_trade(info['buy_price'], info['sell_price'], info['qty'])
+                o = self.connector.fetch_order(info['sell_order_id'])
+                if o is None:
+                    continue
+                status = o.get('status')
+                filled_amt = float(o.get('filled') or 0)
+
+                if status == 'closed':
+                    self._record_trade(info.get('buy_price'), info['sell_price'], info['qty'])
                     del self.grid_orders[price_key]   # 레벨 회수 → 같은 가격 재사용 가능
+                elif status == 'canceled':
+                    remaining = max(info['qty'] - filled_amt, 0)
+                    if filled_amt > 0:
+                        logger.warning(
+                            f"⚠️  매도주문이 거래소에서 외부적으로 취소됨(₩{info['sell_price']:,.0f}), "
+                            f"{filled_amt:.8f}BTC는 이미 팔림 — 부분 확정, 나머지 {remaining:.8f}BTC 재매도 시도"
+                        )
+                        self._record_trade(info.get('buy_price'), info['sell_price'], filled_amt)
+                    if remaining > 0:
+                        info['qty'] = remaining
+                        info['status'] = 'sell_retry'
+                    else:
+                        del self.grid_orders[price_key]
+                # status == 'open' → 그대로 대기
 
         self._save_state()
 
+    def _on_buy_filled(self, price_key: str, info: dict):
+        buy_price = info['buy_price']
+        logger.info(f"[체결] 매수 ₩{buy_price:,.0f} × {info['qty']:.8f}BTC")
+        sell_order = self.connector.place_limit_sell(info['sell_price'], info['qty'])
+        if sell_order:
+            info['status'] = 'pending_sell'
+            info['sell_order_id'] = sell_order.get('id', '')
+        else:
+            info['status'] = 'sell_retry'  # 매도 등록 실패(최소주문금액 미달 등) → 다음 사이클 재시도
+
     def cancel_all(self):
-        """미체결 매수 주문 전체 취소. (체결 후 매도 대기중인 건 남겨서 익절 기회 유지)"""
+        """
+        미체결 매수 주문만 취소. (체결 후 매도 대기중인 건 남겨서 익절 기회 유지 —
+        정상적인 그리드 재중심 때 쓰는 취소이지 전량 청산이 아님. 손절 시에는
+        liquidate_all()을 쓸 것.)
+
+        부분체결된 상태로 취소된 주문은 조용히 버리지 않고 sell_retry로 돌려
+        다음 사이클에 매도를 다시 시도하게 한다.
+        """
         cancelled = 0
         for price_key, info in list(self.grid_orders.items()):
             if info['status'] == 'open':
-                if self.connector.cancel_order(info.get('order_id', '')):
+                filled_qty = self.connector.cancel_order(info.get('order_id', ''))
+                if filled_qty is None:
+                    logger.error(f"주문 취소 실패, 다음 사이클에 재시도: ₩{info['buy_price']:,.0f}")
+                    continue
+                if filled_qty > 0:
+                    info['qty'] = filled_qty
+                    info['status'] = 'sell_retry'
+                else:
                     del self.grid_orders[price_key]
-                    cancelled += 1
-                    time.sleep(0.1)
+                cancelled += 1
+                time.sleep(0.1)
         self._save_state()
         logger.info(f"🛑 미체결 매수 취소: {cancelled}개")
+
+    def liquidate_all(self):
+        """
+        손절/완전청산 전용. cancel_all()과 달리 '매도 대기중'(pending_sell) 주문도
+        같이 취소해서 그 BTC를 자유잔고로 되돌린다 — 그래야 뒤이어 호출하는
+        시장가 전량매도가 실제로 전량을 처리할 수 있다. cancel_all()만 쓰면
+        pending_sell에 걸린 BTC가 손절 이후에도 그대로 시장에 노출된 채 남는다.
+        """
+        n = 0
+        for price_key, info in list(self.grid_orders.items()):
+            status = info['status']
+            if status == 'open':
+                filled_qty = self.connector.cancel_order(info.get('order_id', ''))
+                if filled_qty is None:
+                    logger.error(f"❌ 청산 중 매수취소 실패(수동 확인 필요): ₩{info['buy_price']:,.0f}")
+                    continue
+                if filled_qty > 0:
+                    logger.warning(f"⚠️  청산 중 부분체결 회수: {filled_qty:.8f}BTC (뒤이은 시장가 매도에 포함됨)")
+                del self.grid_orders[price_key]
+                n += 1
+            elif status == 'pending_sell':
+                filled_qty = self.connector.cancel_order(info.get('sell_order_id', ''))
+                if filled_qty is None:
+                    logger.error(
+                        f"❌ 청산 중 매도취소 실패(수동 확인 필요): ₩{info['sell_price']:,.0f} "
+                        f"— BTC가 여전히 매도주문에 묶여있을 수 있습니다."
+                    )
+                    continue
+                del self.grid_orders[price_key]
+                n += 1
+            elif status == 'sell_retry':
+                del self.grid_orders[price_key]
+                n += 1
+            time.sleep(0.1)
+        self._save_state()
+        logger.info(f"🧹 전량 청산 정리: {n}건 취소/회수 완료 (남은 BTC는 이어서 시장가로 매도)")
+
+    def reconcile_with_exchange(self):
+        """
+        재시작 시 로컬 상태(grid_state.json)와 거래소의 실제 상태를 대조한다.
+        모의 모드에서는 대조할 실제 거래소 상태가 없으므로 아무 일도 하지 않는다.
+
+          1. 로컬에 '진행 중'으로 기록된 주문들을 하나씩 실제 상태로 재조회해서
+             프로그램이 꺼져 있던 동안 체결/취소/부분체결된 것들을 반영한다.
+          2. 거래소에는 실제로 열려 있는데 로컬 상태 파일에는 전혀 없는 주문
+             (state 파일 유실, 다른 곳에서 직접 주문 등)을 찾아서 로컬에
+             편입시킨다 — 이게 없으면 그 주문은 프로그램에게 영원히 보이지 않고,
+             재중심/손절 때도 취소 대상에서 빠진다.
+        """
+        if not self.connector.has_key:
+            return
+
+        logger.info("🔄 재시작 대조: 거래소의 실제 주문 상태와 로컬 상태를 비교합니다...")
+        before = len(self.grid_orders)
+
+        # 1) 로컬에 있는 항목들 재확인 — check_fills_and_place_sells와 동일한 로직을
+        #    쓰면 되므로, current_price 없이도 처리 가능한 상태전이만 먼저 정리한다.
+        for price_key, info in list(self.grid_orders.items()):
+            if info['status'] == 'open':
+                o = self.connector.fetch_order(info.get('order_id', ''))
+                if o is None:
+                    logger.warning(f"  ⚠️  로컬에만 있는 매수주문 조회 실패(거래소에 없을 수 있음): {price_key}")
+                    continue
+                status, filled_amt = o.get('status'), float(o.get('filled') or 0)
+                if status == 'closed':
+                    logger.info(f"  ↳ 오프라인 중 매수 체결됨: ₩{info['buy_price']:,.0f} → 다음 사이클에 매도 등록")
+                    info['qty'] = filled_amt if filled_amt > 0 else \
+                        (info['amount_krw'] * (1 - FEE_RATE)) / info['buy_price']
+                elif status == 'canceled':
+                    if filled_amt > 0:
+                        logger.warning(f"  ↳ 오프라인 중 매수 부분체결 후 취소됨: {filled_amt:.8f}BTC 회수")
+                        info['qty'] = filled_amt
+                        info['status'] = 'sell_retry'
+                    else:
+                        logger.info(f"  ↳ 오프라인 중 매수 취소됨(체결 없음): ₩{info['buy_price']:,.0f} → 레벨 제거")
+                        del self.grid_orders[price_key]
+            elif info['status'] == 'pending_sell':
+                o = self.connector.fetch_order(info.get('sell_order_id', ''))
+                if o is None:
+                    logger.warning(f"  ⚠️  로컬에만 있는 매도주문 조회 실패(거래소에 없을 수 있음): {price_key}")
+                    continue
+                status, filled_amt = o.get('status'), float(o.get('filled') or 0)
+                if status == 'canceled' and filled_amt == 0:
+                    logger.warning(f"  ↳ 오프라인 중 매도 취소됨: ₩{info['sell_price']:,.0f} → 재매도 대기열로 전환")
+                    info['status'] = 'sell_retry'
+                elif status == 'canceled' and filled_amt > 0:
+                    remaining = max(info['qty'] - filled_amt, 0)
+                    logger.warning(f"  ↳ 오프라인 중 매도 부분체결 후 취소됨: {filled_amt:.8f}BTC 확정 판매, 나머지 {remaining:.8f}BTC 재매도")
+                    self._record_trade(info.get('buy_price'), info['sell_price'], filled_amt)
+                    if remaining > 0:
+                        info['qty'] = remaining
+                        info['status'] = 'sell_retry'
+                    else:
+                        del self.grid_orders[price_key]
+                # 'closed'(완전 매도 완료)는 다음 check_fills_and_place_sells 사이클에서
+                # 정상적으로 손익 기록 후 레벨 회수됨 — 여기선 그대로 둔다.
+
+        # 2) 거래소에는 있는데 로컬엔 없는 주문 — import
+        known_ids = set()
+        for info in self.grid_orders.values():
+            if info.get('order_id'):
+                known_ids.add(info['order_id'])
+            if info.get('sell_order_id'):
+                known_ids.add(info['sell_order_id'])
+
+        exchange_orders = self.connector.get_open_orders()
+        imported = 0
+        for o in exchange_orders:
+            oid = o.get('id')
+            if not oid or oid in known_ids:
+                continue
+            side = o.get('side')
+            price = float(o.get('price') or 0)
+            amount = float(o.get('amount') or 0)
+            if price <= 0 or amount <= 0:
+                continue
+            key = f"imported_{oid}"
+            if side == 'buy':
+                self.grid_orders[key] = {
+                    'order_id': oid, 'buy_price': price,
+                    'sell_price': round(price * (1 + GRID_MIN_PCT), -3),
+                    'amount_krw': price * amount, 'status': 'open',
+                    'placed_at': datetime.now().isoformat(),
+                    'note': '재시작 대조 중 거래소에서 발견되어 자동 편입된 주문',
+                }
+            elif side == 'sell':
+                self.grid_orders[key] = {
+                    'order_id': '', 'sell_order_id': oid,
+                    'buy_price': None,  # 매수단가 불명 — _record_trade가 손익집계 생략
+                    'sell_price': price, 'qty': amount, 'status': 'pending_sell',
+                    'placed_at': datetime.now().isoformat(),
+                    'note': '재시작 대조 중 거래소에서 발견되어 자동 편입된 주문 (매수단가 불명)',
+                }
+            else:
+                continue
+            imported += 1
+            logger.warning(
+                f"  ⚠️  로컬에 없던 미체결 {side}주문을 발견해 편입했습니다: "
+                f"₩{price:,.0f} × {amount:.8f}BTC (주문ID {oid}). "
+                f"업비트 앱에서 이 주문이 맞는지 꼭 확인하세요."
+            )
+
+        self._save_state()
+        after = len(self.grid_orders)
+        logger.info(
+            f"✅ 대조 완료: 로컬 {before}개 → {after}개 "
+            f"(거래소에서 새로 편입 {imported}개). risk_state.json 기준 평가자산도 다시 확인하세요."
+        )
 
     def get_summary(self) -> dict:
         total = len(self.grid_orders)
@@ -816,9 +1087,11 @@ class RiskManager:
         if equity <= stop_line:
             logger.error(
                 f"🛑 손절선 도달! 평가자산 ₩{equity:,.0f} <= 손절선 ₩{stop_line:,.0f} "
-                f"(기준선의 {STOP_LOSS_PCT*100:.0f}%). 전량 취소 후 정지합니다."
+                f"(기준선의 {STOP_LOSS_PCT*100:.0f}%). 전량 청산 후 정지합니다."
             )
-            self.grid.cancel_all()
+            # cancel_all()이 아니라 liquidate_all()을 쓴다: pending_sell(매도 대기)에
+            # 걸린 BTC까지 전부 회수해야, 뒤이은 시장가 매도가 진짜 "전량"이 된다.
+            self.grid.liquidate_all()
             balance = self.connector.get_balance()
             self.connector.sell_all_market(balance['BTC'])
             self.halted = True
@@ -913,6 +1186,10 @@ class GridBot:
     def __init__(self):
         self.connector = UpbitConnector()
         self.grid = GridEngine(self.connector)
+        # 로컬 상태 파일을 그대로 믿지 않고, 재시작할 때마다 거래소의 실제 주문
+        # 상태와 반드시 대조한다 (꺼져 있던 동안 체결/취소/부분체결된 것 반영 +
+        # 로컬에 없는 미체결 주문 편입).
+        self.grid.reconcile_with_exchange()
         balance = self.connector.get_balance()
         # 실제 잔고가 설정값보다 적으면 실제 잔고 기준으로 방어적으로 운용
         self.initial_capital = min(CAPITAL, balance['KRW']) if self.connector.has_key else CAPITAL
@@ -977,7 +1254,16 @@ def main():
                         help='업비트 앱에서 수동으로 시드를 출금했다면 실행 → 기준선 리셋')
     parser.add_argument('--withdraw-now', type=float, metavar='AMOUNT',
                         help='지정한 금액을 지금 즉시 실제 출금 API로 1회 테스트 실행 (자동루프 없이 단발성)')
+    parser.add_argument('--reconcile', action='store_true',
+                        help='루프를 돌리지 않고, 로컬 상태와 거래소 실제 주문만 대조하고 종료 (재시작 전 점검용)')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='실제 API 키로 시세/잔고/미체결주문은 조회하되, 매수/매도/취소/출금은 '
+                             '절대 보내지 않음 (실거래 투입 전 4단계: 연결 확인용)')
     args = parser.parse_args()
+
+    if args.dry_run:
+        global DRY_RUN
+        DRY_RUN = True
 
     try:
         validate_config()
@@ -990,6 +1276,15 @@ def main():
         return
 
     connector = UpbitConnector()
+
+    if args.reconcile:
+        if not connector.has_key:
+            logger.error("❌ API 키 없이는 대조할 실제 거래소 주문이 없습니다.")
+            sys.exit(1)
+        grid = GridEngine(connector)
+        grid.reconcile_with_exchange()
+        print(f"✅ 대조 완료. 현재 상태: {grid.get_summary()}")
+        return
 
     if args.withdraw_now is not None:
         if not connector.has_key:
