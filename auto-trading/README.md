@@ -12,7 +12,9 @@ BTC/KRW 그리드 자동매매 프로그램입니다. `grid_engine.py` 하나로
 이 코드가 실제로 하는 일:
 - 왕복 수수료보다 마진이 작은 그리드는 애초에 만들지 않습니다 (구조적으로 적자 매매 차단).
 - 평가자산이 `STOP_LOSS_PCT` 밑으로 떨어지면 **즉시 전량 취소하고 정지**합니다.
-- 목표금액(`TARGET_KRW`) 도달 시 알림, 필요하면 자동으로 전량 매도 후 정지합니다.
+- 평가자산이 **시드 × `WITHDRAW_MULTIPLE`**(기본 5만원→10만원)에 도달하면
+  시드금액만큼 출금하고, **정지하지 않고 남은 금액으로 계속 매매**합니다.
+  이 사이클이 반복됩니다 (10만→시드 5만 출금, 남은 5만으로 계속→다시 10만→...).
 - 처음 API 키로 실제 잔고를 확인해서, 설정한 자본보다 실제 잔고가 적으면
   실제 잔고 기준으로 방어적으로 운용합니다.
 
@@ -20,6 +22,8 @@ BTC/KRW 그리드 자동매매 프로그램입니다. `grid_engine.py` 하나로
 1. `--check`로 설정 검증
 2. API 키 없이(모의 모드) `--once`로 여러 번 로그를 확인
 3. 소액(5만원)으로 시작해서 `STOP_LOSS_PCT`를 타이트하게(예: 0.92) 잡고 며칠 관찰
+4. 자동출금을 켤 거라면(`AUTO_WITHDRAW_ENABLED=true`) `--withdraw-now`로
+   소액(예: 만원) 먼저 실제 출금 테스트를 해보고 계좌에 들어오는지 확인
 
 ## 설치
 
@@ -30,8 +34,15 @@ cp .env.example .env
 # .env를 열어서 업비트 API 키와 설정값을 채우세요
 ```
 
-업비트 API 키는 **주문 권한만** 부여하고 **출금 권한은 절대 주지 마세요.**
-(마이페이지 > Open API 관리 에서 발급 시 "자산조회", "주문" 만 체크)
+**API 키 권한은 사용 방식에 따라 다르게 주세요:**
+- `AUTO_WITHDRAW_ENABLED=false`(기본값, 권장) — "자산조회", "주문"만 체크하고
+  **출금 권한은 주지 마세요.** 목표 도달 시 알림만 오고, 실제 출금은 업비트
+  앱에서 직접 하는 방식입니다. 가장 안전합니다.
+- `AUTO_WITHDRAW_ENABLED=true` — "출금하기" 권한까지 체크해야 합니다. 이 경우
+  반드시 업비트 마이페이지에서 **출금 계좌를 사전에 등록**하고, API 키 발급 시
+  **허용 IP**를 설정하세요 (둘 다 업비트 사이트에서 직접 해야 하는 수동 작업이며,
+  이 프로그램이 대신해줄 수 없습니다). 신규/변경된 키는 업비트 정책상 최대
+  72시간 출금이 제한될 수 있습니다.
 
 ## 실행
 
@@ -51,6 +62,13 @@ python grid_engine.py --backtest
 # 5) 실전/모의 무한 루프 (기본 3분 주기)
 python grid_engine.py
 python grid_engine.py --interval 180
+
+# 6) (AUTO_WITHDRAW_ENABLED=false일 때) 업비트 앱에서 수동으로 시드를
+#    출금했다면, 이 명령으로 봇에게 알려서 기준선을 리셋
+python grid_engine.py --confirm-withdrawal
+
+# 7) 실제 출금 API가 내 계정에서 동작하는지 소액으로 미리 테스트
+python grid_engine.py --withdraw-now 10000
 ```
 
 ## GCP VM에서 24시간 돌리기
@@ -66,19 +84,35 @@ nohup python3 grid_engine.py > /dev/null 2>&1 &
 
 ## 파일
 
-- `grid_engine.py` — 본체 (그리드 엔진 + 레짐 감지 + 리스크 관리)
-- `grid_state.json` — 실행 중 자동 생성되는 상태 파일 (그리드 현황, 누적손익)
+- `grid_engine.py` — 본체 (그리드 엔진 + 레짐 감지 + 리스크/출금 관리)
+- `grid_state.json` — 그리드 현황, 누적 실현손익 (자동 생성)
+- `risk_state.json` — 현재 기준선(시드), 누적 출금액 (자동 생성)
 - `trading.log` — 실행 로그
+
+## 시드 출금 사이클이 동작하는 방식
+
+1. 시드 5만원으로 그리드 매매 시작 (`baseline` = 50,000)
+2. 평가자산이 `baseline × WITHDRAW_MULTIPLE`(기본 10만원)에 도달
+3. `AUTO_WITHDRAW_ENABLED=false`(기본) → 로그에 알림, 사람이 업비트 앱에서
+   5만원 수동 출금 → `--confirm-withdrawal` 실행
+   `AUTO_WITHDRAW_ENABLED=true` → 봇이 자동으로 5만원 출금 API 호출
+4. 출금이 확정되면 `baseline`이 "그 시점의 남은 평가자산"으로 갱신됨
+   (보통 다시 ~5만원 근처) → 다음 목표는 새 baseline × 2
+5. 봇은 멈추지 않고 계속 이 사이클을 반복합니다.
+
+손절선(`STOP_LOSS_PCT`)도 이 `baseline` 기준으로 다시 계산되므로, 출금 이후
+"지금 굴리고 있는 시드"를 기준으로 보호가 계속 유지됩니다.
 
 ## 설정값 (.env)
 
 | 변수 | 기본값 | 설명 |
 |---|---|---|
 | `UPBIT_ACCESS_KEY` / `UPBIT_SECRET_KEY` | (없음) | 비우면 모의 모드 |
-| `TRADING_CAPITAL_KRW` | 50000 | 투입 원금 |
-| `TARGET_KRW` | 100000 | 목표 평가자산 |
-| `STOP_LOSS_PCT` | 0.85 | 이 비율 밑이면 전량 정지 (0.85=15% 손실 허용) |
-| `AUTO_STOP_AT_TARGET` | true | 목표 도달 시 자동 매도+정지 |
+| `TRADING_CAPITAL_KRW` | 50000 | 시드(원금) |
+| `STOP_LOSS_PCT` | 0.85 | 기준선의 이 비율 밑이면 전량 정지 (0.85=15% 손실 허용) |
+| `WITHDRAW_MULTIPLE` | 2.0 | 기준선의 이 배수 도달 시 출금 트리거 |
+| `AUTO_WITHDRAW_ENABLED` | false | true면 실제 출금 API 자동 호출 |
+| `WITHDRAW_ALERT_COOLDOWN_SEC` | 3600 | 출금 알림 반복 간격(초) |
 | `GRID_LEVELS` | 4 | 그리드 단계 수 |
 | `GRID_MIN_PCT` | 0.006 | 최소 그리드 간격(현재가 대비 %, 수수료 손실 방지) |
 

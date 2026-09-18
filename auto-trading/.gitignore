@@ -1,5 +1,6 @@
 .env
 grid_state.json
+risk_state.json
 trading.log
 __pycache__/
 *.pyc

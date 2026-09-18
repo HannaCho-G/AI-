@@ -15,24 +15,31 @@
      (수수료만 내고 손실 보는 매매를 구조적으로 차단)
   2. 평가자산이 설정한 손절선 아래로 떨어지면 즉시 전량 취소 후 정지
      (하락장에서 "물타기"가 무한 반복되며 원금을 다 태우는 것 방지)
-  3. 목표금액 도달 시 알림 (옵션으로 자동정지 및 전량 매도)
+  3. 평가자산이 "시드 × WITHDRAW_MULTIPLE"에 도달하면 시드금액만큼
+     출금(알림 또는 자동)하고, 나머지 금액으로 계속 매매 (정지하지 않음)
   4. 그리드가 절반만 체결된 채 영원히 방치되지 않도록 자동 재중심
 
 [실행]
-  python grid_engine.py --check          # 설정값 검증만 (주문 없음)
-  python grid_engine.py --status         # 현재 시장/레짐 상태 확인
-  python grid_engine.py --once           # 1회 사이클만 실행
-  python grid_engine.py                  # 무한 루프 (실전/모의)
-  python grid_engine.py --backtest       # 그리드 백테스트
+  python grid_engine.py --check              # 설정값 검증만 (주문 없음)
+  python grid_engine.py --status             # 현재 시장/레짐 상태 확인
+  python grid_engine.py --once               # 1회 사이클만 실행
+  python grid_engine.py                      # 무한 루프 (실전/모의)
+  python grid_engine.py --backtest           # 그리드 백테스트
+  python grid_engine.py --confirm-withdrawal # 수동으로 출금했다면 이 명령으로 시드 리셋
+  python grid_engine.py --withdraw-now 50000 # 지금 즉시 실제 출금 API 1회 테스트 실행
 
 [설정]
   모든 설정은 환경변수로 조절합니다 (.env 파일을 만들어 사용 가능).
   주요 값:
     UPBIT_ACCESS_KEY / UPBIT_SECRET_KEY  - 없으면 자동으로 모의(paper) 모드
-    TRADING_CAPITAL_KRW   (기본 50000)   - 실제 투입할 원금
-    TARGET_KRW            (기본 100000)  - 목표 평가자산 (도달 시 알림)
+    TRADING_CAPITAL_KRW   (기본 50000)   - 시드(원금). 출금 후에도 이 금액을 기준으로 다시 굴림
+    WITHDRAW_MULTIPLE     (기본 2.0)     - 시드의 이 배수에 도달하면 출금 트리거 (5만→10만)
     STOP_LOSS_PCT         (기본 0.85)    - 이 비율 밑으로 떨어지면 전량 정지
-    AUTO_STOP_AT_TARGET   (기본 true)    - 목표 도달 시 자동 매도 후 정지
+    AUTO_WITHDRAW_ENABLED (기본 false)   - true면 실제 업비트 출금 API를 자동 호출
+                                            (사전에 업비트에서 출금계좌 등록 + API 키
+                                            출금권한/IP 화이트리스트 설정 필수. 기본값은
+                                            false로, 알림만 하고 실제 출금은 사람이
+                                            수동으로 한 뒤 --confirm-withdrawal로 확인)
 """
 
 import os
@@ -92,8 +99,7 @@ def _env_bool(key: str, default: bool) -> bool:
 # ── 공통 파라미터 ────────────────────────────────────────────
 SYMBOL          = os.environ.get('SYMBOL', 'BTC/KRW')
 TIMEFRAME       = os.environ.get('TIMEFRAME', '15m')   # 2~3일 단위 대응 → 일봉은 너무 느림
-CAPITAL         = _env_float('TRADING_CAPITAL_KRW', 50_000)   # 실제 투입 원금
-TARGET_KRW      = _env_float('TARGET_KRW', 100_000)           # 목표 평가자산
+CAPITAL         = _env_float('TRADING_CAPITAL_KRW', 50_000)   # 시드(원금)
 FEE_RATE        = _env_float('FEE_RATE', 0.0005)              # 업비트 수수료 0.05%
 MIN_ORDER_KRW   = 5_000         # 업비트 최소 주문금액 (거래소 고정값)
 
@@ -104,15 +110,18 @@ GRID_MIN_PCT     = _env_float('GRID_MIN_PCT', 0.006)  # 그리드 간격 최소�
 GRID_CAPITAL_PCT = _env_float('GRID_CAPITAL_PCT', 0.80)
 RECENTER_MULT    = _env_float('RECENTER_MULT', 2.0)   # 중심가 대비 이만큼(간격 배수) 벗어나면 재중심
 
-# ── 리스크 관리 ──────────────────────────────────────────────
-STOP_LOSS_PCT       = _env_float('STOP_LOSS_PCT', 0.85)   # 평가자산이 초기자본의 85% 밑이면 정지
-AUTO_STOP_AT_TARGET = _env_bool('AUTO_STOP_AT_TARGET', True)
+# ── 리스크 관리 / 시드 출금 ───────────────────────────────────
+STOP_LOSS_PCT       = _env_float('STOP_LOSS_PCT', 0.85)   # 평가자산이 시드의 85% 밑이면 정지
+WITHDRAW_MULTIPLE   = _env_float('WITHDRAW_MULTIPLE', 2.0)  # 시드의 이 배수 도달 시 출금 트리거
+AUTO_WITHDRAW_ENABLED = _env_bool('AUTO_WITHDRAW_ENABLED', False)  # true=실제 출금 API 자동 호출
+WITHDRAW_ALERT_COOLDOWN_SEC = _env_int('WITHDRAW_ALERT_COOLDOWN_SEC', 3600)  # 알림 반복 간격
 
 # ── 레짐 파라미터 ────────────────────────────────────────────
 REGIME_PROB_MIN = _env_float('REGIME_PROB_MIN', 0.52)
 
-STATE_FILE  = os.environ.get('STATE_FILE', 'grid_state.json')
-LOG_FILE    = os.environ.get('LOG_FILE', 'trading.log')
+STATE_FILE       = os.environ.get('STATE_FILE', 'grid_state.json')
+RISK_STATE_FILE  = os.environ.get('RISK_STATE_FILE', 'risk_state.json')
+LOG_FILE         = os.environ.get('LOG_FILE', 'trading.log')
 
 logging.basicConfig(
     level=logging.INFO,
@@ -157,20 +166,26 @@ def validate_config():
         problems.append("TRADING_CAPITAL_KRW는 0보다 커야 합니다.")
     if not (0 < STOP_LOSS_PCT < 1):
         problems.append("STOP_LOSS_PCT는 0과 1 사이여야 합니다 (예: 0.85).")
-    if TARGET_KRW <= CAPITAL:
-        logger.warning(
-            f"⚠️  TARGET_KRW(₩{TARGET_KRW:,.0f})가 초기자본(₩{CAPITAL:,.0f})보다 "
-            f"작거나 같습니다. 목표를 다시 확인하세요."
+    if WITHDRAW_MULTIPLE <= 1.0:
+        problems.append("WITHDRAW_MULTIPLE은 1보다 커야 합니다 (예: 2.0 = 시드의 2배).")
+    if AUTO_WITHDRAW_ENABLED and not (
+        os.environ.get('UPBIT_ACCESS_KEY') and os.environ.get('UPBIT_SECRET_KEY')
+    ):
+        problems.append(
+            "AUTO_WITHDRAW_ENABLED=true인데 API 키가 없습니다. "
+            "모의 모드에서는 실제 출금이 불가능하므로 false로 두거나 API 키를 설정하세요."
         )
 
     if problems:
         msg = "설정 오류로 실행을 중단합니다:\n" + "\n".join(f"  - {p}" for p in problems)
         raise ConfigError(msg)
 
+    withdraw_target = CAPITAL * WITHDRAW_MULTIPLE
     logger.info(
-        f"✅ 설정 검증 통과 | 자본 ₩{CAPITAL:,.0f} | 그리드 {GRID_LEVELS}단계 "
-        f"| 레벨당 ₩{per_level:,.0f} | 목표 ₩{TARGET_KRW:,.0f} | "
-        f"손절선 {STOP_LOSS_PCT*100:.0f}%"
+        f"✅ 설정 검증 통과 | 시드 ₩{CAPITAL:,.0f} | 그리드 {GRID_LEVELS}단계 "
+        f"| 레벨당 ₩{per_level:,.0f} | 출금 트리거 ₩{withdraw_target:,.0f} "
+        f"(시드×{WITHDRAW_MULTIPLE}) | 손절선 {STOP_LOSS_PCT*100:.0f}% | "
+        f"자동출금 {'ON' if AUTO_WITHDRAW_ENABLED else 'OFF(알림만)'}"
     )
 
 
@@ -289,7 +304,7 @@ class UpbitConnector:
             return False
 
     def sell_all_market(self, qty: float) -> Optional[dict]:
-        """손절선/목표 도달 시 즉시 청산용 시장가 매도"""
+        """손절선 도달 시 즉시 청산용 시장가 매도"""
         if qty <= 0:
             return None
         if not self.has_key:
@@ -301,6 +316,40 @@ class UpbitConnector:
             return order
         except Exception as e:
             logger.error(f"❌ 시장가 매도 실패: {e}")
+            return None
+
+    def sell_market_krw(self, amount_krw: float, current_price: float) -> Optional[dict]:
+        """지정한 원화 금액만큼만 시장가로 매도 (출금 재원 마련용)"""
+        qty = amount_krw / current_price
+        return self.sell_all_market(qty)
+
+    def withdraw_krw(self, amount: float) -> Optional[dict]:
+        """
+        원화(KRW) 실제 출금. ccxt의 통합 withdraw()는 업비트에 한해 KRW를
+        특수 처리해서 주소(address) 없이 호출 가능하다.
+
+        ⚠️ 이 메서드는 실행 전 반드시 아래가 되어 있어야 성공합니다 (업비트 웹/앱에서
+        1회 수동 설정, API로 대신할 수 없음):
+          1. 업비트 마이페이지에서 본인 명의 은행계좌를 "출금 계좌"로 사전 등록
+          2. Open API 키 발급 시 "출금하기" 권한 체크 + 허용 IP 등록
+        이 사전조건이 안 되어 있으면 아래 호출은 예외를 던지고, 그 사유를 그대로
+        로그에 남긴다 (여기서 추측해서 넘어가지 않고 실패를 명확히 알림).
+        """
+        if not self.has_key:
+            logger.warning("[모의] 출금은 모의 모드에서 지원하지 않습니다 (실제 API 키 필요).")
+            return None
+        try:
+            result = self.exchange.withdraw('KRW', amount, None)
+            logger.info(f"🏧 출금 요청 성공: ₩{amount:,.0f} → 등록된 계좌")
+            return result
+        except Exception as e:
+            logger.error(
+                f"❌ 출금 요청 실패: {e}\n"
+                f"   확인할 것: (1) 업비트에 출금계좌가 등록/인증되어 있는지 "
+                f"(2) API 키에 출금 권한 + 허용 IP가 설정되어 있는지 "
+                f"(3) 신규/변경된 API 키라면 업비트 정책상 일정 시간(최대 72시간) "
+                f"출금이 제한될 수 있습니다."
+            )
             return None
 
 
@@ -709,14 +758,46 @@ class GridEngine:
 
 
 # ============================================================
-# 리스크 매니저 (원금 보호 / 목표 도달 처리)
+# 리스크 매니저 (원금 보호 / 시드 출금 처리)
 # ============================================================
 class RiskManager:
+    """
+    두 가지 일을 한다:
+      1. 손절: 평가자산이 '현재 사이클 기준선'의 STOP_LOSS_PCT 밑으로
+         떨어지면 전량 취소+매도 후 정지.
+      2. 시드 출금: 평가자산이 '기준선 × WITHDRAW_MULTIPLE'에 도달하면
+         기준선만큼(=시드) 출금하고, 봇은 정지하지 않고 나머지로 계속 매매.
+         기준선은 출금이 성공할 때마다 그 시점의 잔여 평가자산으로 갱신되어,
+         "항상 시드 5만원으로 굴리다가 2배 되면 5만원 빼는" 사이클을 반복한다.
+    """
     def __init__(self, connector: UpbitConnector, grid: GridEngine, initial_capital: float):
         self.connector = connector
         self.grid = grid
         self.initial_capital = initial_capital
         self.halted = False
+        self.baseline = initial_capital       # 이번 사이클의 기준 시드
+        self.total_withdrawn = 0.0
+        self.last_alert_at = 0.0
+        self._load_state()
+
+    def _load_state(self):
+        try:
+            with open(RISK_STATE_FILE, 'r', encoding='utf-8') as f:
+                state = json.load(f)
+                self.baseline = state.get('baseline', self.initial_capital)
+                self.total_withdrawn = state.get('total_withdrawn', 0.0)
+                logger.info(f"✅ 출금상태 복원: 기준선 ₩{self.baseline:,.0f}, "
+                            f"누적출금 ₩{self.total_withdrawn:,.0f}")
+        except FileNotFoundError:
+            pass
+
+    def _save_state(self):
+        with open(RISK_STATE_FILE, 'w', encoding='utf-8') as f:
+            json.dump({
+                'baseline': self.baseline,
+                'total_withdrawn': self.total_withdrawn,
+                'updated_at': datetime.now().isoformat(),
+            }, f, ensure_ascii=False, indent=2)
 
     def get_equity(self, current_price: float) -> float:
         balance = self.connector.get_balance()
@@ -729,33 +810,99 @@ class RiskManager:
         )
         return krw + btc_qty * current_price
 
-    def check(self, current_price: float) -> bool:
-        """True를 반환하면 정상 진행, False면 이번 사이클은 정지해야 함"""
-        equity = self.get_equity(current_price)
-        stop_line = self.initial_capital * STOP_LOSS_PCT
-
+    def check_stop_loss(self, current_price: float, equity: float) -> bool:
+        """True면 정상 진행, False면 손절 발동으로 이번 사이클 중단"""
+        stop_line = self.baseline * STOP_LOSS_PCT
         if equity <= stop_line:
             logger.error(
                 f"🛑 손절선 도달! 평가자산 ₩{equity:,.0f} <= 손절선 ₩{stop_line:,.0f} "
-                f"(초기자본의 {STOP_LOSS_PCT*100:.0f}%). 전량 취소 후 정지합니다."
+                f"(기준선의 {STOP_LOSS_PCT*100:.0f}%). 전량 취소 후 정지합니다."
             )
             self.grid.cancel_all()
             balance = self.connector.get_balance()
             self.connector.sell_all_market(balance['BTC'])
             self.halted = True
             return False
+        return True
 
-        if equity >= TARGET_KRW:
-            logger.info(f"🎯 목표 달성! 평가자산 ₩{equity:,.0f} >= 목표 ₩{TARGET_KRW:,.0f}")
-            if AUTO_STOP_AT_TARGET:
-                logger.info("AUTO_STOP_AT_TARGET=true → 전량 매도 후 정지합니다.")
-                self.grid.cancel_all()
-                balance = self.connector.get_balance()
-                self.connector.sell_all_market(balance['BTC'])
-                self.halted = True
-                return False
+    def check_withdraw(self, current_price: float, equity: float):
+        """
+        평가자산이 기준선×WITHDRAW_MULTIPLE에 도달하면:
+          - AUTO_WITHDRAW_ENABLED=true : 실제 출금 API 호출까지 자동 수행
+          - false(기본값)              : 반복 알림만 하고, 사람이 수동으로
+                                          업비트 앱에서 출금 후 --confirm-withdrawal 실행
+        """
+        trigger = self.baseline * WITHDRAW_MULTIPLE
+        if equity < trigger:
+            return
 
-        logger.info(f"  💰 평가자산: ₩{equity:,.0f}  (초기자본 대비 {equity/self.initial_capital*100:.1f}%)")
+        seed = self.baseline
+
+        if not AUTO_WITHDRAW_ENABLED:
+            now = time.time()
+            if now - self.last_alert_at >= WITHDRAW_ALERT_COOLDOWN_SEC:
+                logger.info(
+                    f"🎯 목표 도달! 평가자산 ₩{equity:,.0f} >= ₩{trigger:,.0f} "
+                    f"(시드 ₩{seed:,.0f}의 {WITHDRAW_MULTIPLE}배). "
+                    f"업비트 앱에서 ₩{seed:,.0f}을 수동으로 출금한 뒤, "
+                    f"'python grid_engine.py --confirm-withdrawal'을 실행해서 "
+                    f"기준선을 리셋해주세요. 매매는 계속 진행됩니다."
+                )
+                self.last_alert_at = now
+            return
+
+        logger.info(f"🎯 목표 도달! 평가자산 ₩{equity:,.0f} → 시드 ₩{seed:,.0f} 자동 출금을 시도합니다.")
+        balance = self.connector.get_balance()
+        if balance['KRW'] < seed:
+            shortfall = seed - balance['KRW']
+            logger.info(f"현금이 부족(₩{balance['KRW']:,.0f})하여 ₩{shortfall:,.0f}만큼 BTC 시장가 매도로 확보합니다.")
+            self.grid.cancel_all()
+            self.connector.sell_market_krw(shortfall, current_price)
+            balance = self.connector.get_balance()
+
+        if balance['KRW'] < seed:
+            logger.warning(f"⚠️  출금 재원 확보 실패 (KRW ₩{balance['KRW']:,.0f} < 시드 ₩{seed:,.0f}). 다음 사이클에 재시도합니다.")
+            return
+
+        result = self.connector.withdraw_krw(seed)
+        if result:
+            # 출금 직후에는 거래소 잔고에 아직 반영 안 됐을 수 있어(처리 지연),
+            # 재조회 대신 방금 계산한 equity에서 출금액을 직접 차감한다.
+            self.confirm_withdrawal(seed, current_price, source='auto', equity_before=equity)
+
+    def confirm_withdrawal(self, amount: float, current_price: float,
+                           source: str = 'manual', equity_before: Optional[float] = None):
+        """
+        출금(수동/자동) 완료를 확정하고 다음 사이클의 기준선을 재설정.
+
+        - source='auto' (봇이 방금 출금 API를 호출한 직후): equity_before에
+          "출금 API 호출 *전*에 계산해둔 평가자산"을 넘겨받는다. 거래소 잔고에는
+          아직 출금이 반영되지 않았을 수 있으므로 amount를 직접 빼서 추정한다.
+        - source='manual' (--confirm-withdrawal, 사용자가 이미 실제로 출금을 마친 뒤
+          실행): equity_before를 넘기지 않는다. 이 시점에 조회되는 실제 잔고는
+          이미 출금이 반영된 값이므로, amount를 또 빼면 이중 차감이 된다.
+          현재 평가자산을 그대로 기준선으로 쓴다.
+        """
+        self.total_withdrawn += amount
+        if equity_before is not None:
+            remaining_equity = equity_before - amount
+        else:
+            remaining_equity = self.get_equity(current_price)
+        self.baseline = max(remaining_equity, CAPITAL * 0.5)  # 너무 작아지지 않도록 하한 보호
+        self._save_state()
+        logger.info(
+            f"✅ 출금 확정({source}): ₩{amount:,.0f} | 누적출금 ₩{self.total_withdrawn:,.0f} | "
+            f"새 기준선 ₩{self.baseline:,.0f}로 계속 매매합니다."
+        )
+
+    def check(self, current_price: float) -> bool:
+        """1사이클에 필요한 리스크 체크를 순서대로 수행. False면 이번 사이클 중단."""
+        equity = self.get_equity(current_price)
+        if not self.check_stop_loss(current_price, equity):
+            return False
+        self.check_withdraw(current_price, equity)
+        logger.info(f"  💰 평가자산: ₩{equity:,.0f}  (기준선 대비 {equity/self.baseline*100:.1f}%, "
+                    f"누적출금 ₩{self.total_withdrawn:,.0f})")
         return True
 
 
@@ -806,7 +953,8 @@ class GridBot:
             except Exception as e:
                 logger.error(f"❌ 루프 오류: {e}", exc_info=True)
             if self.risk.halted:
-                logger.info("정지 상태입니다. grid_state.json을 확인하고 필요 시 수동으로 재시작하세요.")
+                logger.info("🛑 손절선에 도달해 정지했습니다 (목표 도달로는 더 이상 정지하지 않습니다). "
+                            "grid_state.json / risk_state.json을 확인하고 필요 시 수동으로 재시작하세요.")
                 break
             for _ in range(interval_sec):
                 if self._stop:
@@ -825,6 +973,10 @@ def main():
     parser.add_argument('--once', action='store_true', help='1회 실행 후 종료')
     parser.add_argument('--backtest', action='store_true', help='그리드 백테스트')
     parser.add_argument('--interval', type=int, default=180, help='실행 주기(초), 기본 3분')
+    parser.add_argument('--confirm-withdrawal', action='store_true',
+                        help='업비트 앱에서 수동으로 시드를 출금했다면 실행 → 기준선 리셋')
+    parser.add_argument('--withdraw-now', type=float, metavar='AMOUNT',
+                        help='지정한 금액을 지금 즉시 실제 출금 API로 1회 테스트 실행 (자동루프 없이 단발성)')
     args = parser.parse_args()
 
     try:
@@ -838,6 +990,28 @@ def main():
         return
 
     connector = UpbitConnector()
+
+    if args.withdraw_now is not None:
+        if not connector.has_key:
+            logger.error("❌ API 키 없이는 실제 출금을 테스트할 수 없습니다.")
+            sys.exit(1)
+        logger.info(f"🧪 출금 단발 테스트: ₩{args.withdraw_now:,.0f}")
+        result = connector.withdraw_krw(args.withdraw_now)
+        if result:
+            print(f"✅ 출금 요청이 접수되었습니다. 업비트 앱에서 처리 상태를 확인하세요: {result}")
+        else:
+            print("❌ 출금 요청이 실패했습니다. 위 로그의 확인사항을 먼저 점검하세요.")
+        return
+
+    if args.confirm_withdrawal:
+        grid = GridEngine(connector)
+        info = MarketAnalyzer.analyze(connector.fetch_ohlcv(limit=150), collect_sentiment=False)
+        balance = connector.get_balance()
+        initial_capital = min(CAPITAL, balance['KRW']) if connector.has_key else CAPITAL
+        risk = RiskManager(connector, grid, initial_capital)
+        risk.confirm_withdrawal(CAPITAL, info['price'], source='manual')
+        print(f"✅ 수동 출금이 확정되었습니다. 새 기준선: ₩{risk.baseline:,.0f}")
+        return
 
     if args.status:
         df = connector.fetch_ohlcv(limit=150)
