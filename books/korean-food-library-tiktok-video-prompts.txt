@@ -1,0 +1,120 @@
+KOREAN FOOD LIBRARY — TIKTOK 영상 생성 프롬프트 모음
+(AI 영상 생성 도구용. 9:16 세로, 5~15초 클립 기준. 각 클립은 훅 영상/과정 영상/엔딩 영상으로 나눠서 이어붙이는 걸 권장)
+
+공통 스타일 원칙 (모든 프롬프트에 이미 반영됨):
+- 실제 홈쿠킹처럼 따뜻하고 먹음직스러운 자연광/따뜻한 조명 — 광고틱한 스튜디오 조명 아님
+- 손/음식 클로즈업 위주, 사람 얼굴은 선택적 (손만 나와도 충분)
+- 진짜 트렌디한 K-푸드 틱톡처럼: 김 나는 장면, 소스 붓는 장면, 젓가락으로 집는 장면, 치즈/소스 늘어나는 장면 등 "먹방 트리거" 요소
+- 텍스트 오버레이 없이 순수 영상만 생성 (자막은 CapCut/TikTok 편집 단계에서 별도로 넣을 것)
+- 절대 피할 것: 인위적인 3D 렌더, 플라스틱 같은 음식 질감, 과도한 채도, AI 특유의 매끈한 언캐니 손가락
+
+===========================================================
+[공통 훅 영상] — 시리즈 전체에 재사용 가능 (5-8초)
+===========================================================
+
+--- hook-01: 책 표지 오픈 훅 ---
+A close-up shot of hands opening a printed Korean cookbook on a warm wooden kitchen table, natural window light, steam rising from a bowl of Korean soup just out of frame in the background, soft focus. The pages flip slowly revealing colorful food photography. Warm, cozy, real-home aesthetic — not a studio product shot. 9:16 vertical, 6 seconds.
+
+--- hook-02: 재료 나열 몽타주 ---
+A fast-paced montage of Korean pantry staples being placed one by one onto a wooden cutting board: a jar of gochujang, a bottle of soy sauce, a bulb of garlic being smashed, a bunch of green onions, a bag of gochugaru chili flakes. Each ingredient drops into frame with a soft thud, natural kitchen lighting, shallow depth of field. 9:16 vertical, 8 seconds.
+
+--- hook-03: 지글지글 팬 클로즈업 ---
+An extreme close-up of thinly sliced marinated beef bulgogi sizzling in a hot pan, visible steam and light smoke rising, glossy caramelized sauce coating the meat, a wooden spatula pushing the meat around. Warm stovetop lighting, shallow depth of field, appetizing and slightly slow-motion feel. 9:16 vertical, 6 seconds.
+
+===========================================================
+[Vol.1 — K-FOOD: 20가지 대표 한식] 영상 프롬프트
+===========================================================
+
+--- v1-a: 비빔밥 완성 샷 ---
+A top-down shot of a stone bowl (dolsot) bibimbap being assembled: rice base, then colorful vegetables (spinach, carrots, bean sprouts, mushrooms) placed in neat sections, a fried egg placed last in the center, followed by a spoonful of red gochujang sauce drizzled on top. Bright natural light, vivid but realistic colors. 9:16 vertical, 10 seconds.
+
+--- v1-b: 삼겹살 굽는 장면 ---
+A close-up of thick-cut pork belly (samgyeopsal) sizzling and browning on a Korean tabletop grill, tongs flipping the pieces, visible grill marks forming, a small side of garlic cloves and kimchi grilling alongside. Warm restaurant/home ambient lighting, light smoke. 9:16 vertical, 8 seconds.
+
+--- v1-c: 떡볶이 소스 코팅 샷 ---
+A close-up of cylindrical rice cakes (tteokbokki) being tossed and coated in a bubbling red gochujang sauce in a wide pan, the sauce glossy and slightly thick, a wooden spoon stirring, steam rising. Bright warm colors, appetizing texture emphasis. 9:16 vertical, 7 seconds.
+
+===========================================================
+[Vol.2 — Korean Temple Food] 영상 프롬프트
+===========================================================
+
+--- v2-a: 사찰음식 플레이팅 ---
+A top-down shot of a minimalist wooden temple-food tray being arranged: small ceramic bowls of seasoned vegetables, tofu, and mountain greens placed one at a time onto a low wooden table, calm and deliberate hand movements, soft diffused natural light, muted earthy tones (no meat, no strong red sauces visible). Serene, mindful pacing — not fast-cut. 9:16 vertical, 10 seconds.
+
+--- v2-b: 두부 조리 과정 ---
+A close-up of a block of tofu being gently pan-seared until golden on each side in a small pan, light sesame oil sizzling softly, a hand turning it with wooden chopsticks. Calm kitchen lighting, unhurried pace. 9:16 vertical, 7 seconds.
+
+===========================================================
+[Vol.3 — Korean Flavor Foundations] 영상 프롬프트
+===========================================================
+
+--- v3-a: 육수 우려내는 장면 ---
+A close-up of a pot of Korean broth (anchovy and kelp stock) gently simmering, dried anchovies and a square of dried kelp visible in the clear broth, steam rising steadily, a hand straining the broth through a fine mesh sieve into a bowl. Warm stovetop lighting, calm pacing. 9:16 vertical, 9 seconds.
+
+--- v3-b: 양념장 만드는 손 클로즈업 ---
+An overhead close-up of hands mixing a Korean seasoning sauce in a small bowl: soy sauce, minced garlic, sesame oil, and gochugaru being combined with a spoon, the sauce becoming glossy and well-blended. Bright natural light, ingredient textures clearly visible. 9:16 vertical, 6 seconds.
+
+===========================================================
+[Vol.4 — Korean Fermented Jang] 영상 프롬프트
+===========================================================
+
+--- v4-a: 장독대 뚜껑 여는 샷 ---
+A close-up of a hand lifting the lid off a traditional Korean fermentation jar (onggi), revealing dark, glossy fermented soybean paste (doenjang) inside, a wooden spoon scooping a portion out. Warm earthy tones, soft natural light, slightly rustic and artisanal feel. 9:16 vertical, 7 seconds.
+
+--- v4-b: 고추장 계란찜 소스 붓기 ---
+A close-up of gochujang sauce being spooned generously over a sizzling pan of braised short ribs (galbijjim), the sauce glistening and thick, steam rising, a wooden spoon basting the meat. Warm, rich color palette. 9:16 vertical, 8 seconds.
+
+===========================================================
+[Vol.5 — Modern Korean Cooking] 영상 프롬프트
+===========================================================
+
+--- v5-a: 퓨전 볼 조립 샷 ---
+A top-down shot of a modern Korean-fusion grain bowl being assembled quickly in a bright, casual home kitchen: rice, grilled vegetables, a protein, then a squeeze of gochujang mayo drizzled in a zigzag pattern on top. Bright, clean, contemporary lighting — closer to a modern food-blogger aesthetic than traditional. 9:16 vertical, 9 seconds.
+
+--- v5-b: 고추장 소스 지그재그 드리즐 ---
+An extreme close-up, slow-motion shot of a squeeze bottle drizzling glossy gochujang-based sauce in a zigzag pattern over grilled chicken, the sauce catching the light. Bright, clean, modern food-photography lighting. 9:16 vertical, 5 seconds.
+
+===========================================================
+[Vol.6 — The Korean Well-Being Table] 영상 프롬프트
+===========================================================
+
+--- v6-a: 삼계탕 김 나는 샷 ---
+A close-up of a steaming bowl of ginseng chicken soup (samgyetang) with a whole small chicken, glutinous rice, garlic, and jujube visible in the clear broth, thick steam rising dramatically in slightly cooler backlighting. Warm, comforting, wellness-focused atmosphere. 9:16 vertical, 8 seconds.
+
+--- v6-b: 약차 우려내는 장면 ---
+A close-up of a hand pouring hot water over dried herbal tea ingredients (ginger, jujube slices) in a glass teapot, the liquid slowly turning amber as it steeps, gentle steam rising. Soft warm light, calm and restorative mood. 9:16 vertical, 7 seconds.
+
+===========================================================
+[Vol.7 — Korean Cooking Techniques] 영상 프롬프트
+===========================================================
+
+--- v7-a: 칼질 손질법 클로즈업 ---
+An overhead close-up of hands demonstrating a Korean knife technique, julienning a carrot into thin, uniform matchsticks on a wooden cutting board, confident and precise knife movements. Bright, clean instructional lighting, shallow depth of field on the blade. 9:16 vertical, 8 seconds.
+
+--- v7-b: 손질(sonjil) 마늘 다지기 ---
+A close-up of hands mincing garlic cloves finely with a knife on a wooden board, quick rhythmic chopping motion, garlic pieces falling into a small pile. Bright natural kitchen light. 9:16 vertical, 6 seconds.
+
+===========================================================
+[번들/요약본 홍보용] 영상 프롬프트
+===========================================================
+
+--- bundle-a: 7권 책 나열 샷 ---
+A top-down shot of 7 different Korean cookbooks (represented as printed pages/book mockups) being fanned out on a wooden table one after another, each revealing a different colorful food photo, ending with all 7 arranged in a neat row. Warm natural light, satisfying stop-motion-like placement. 9:16 vertical, 10 seconds.
+
+--- bundle-b: 계산대/장바구니 은유 샷 ---
+A close-up of a hand placing a small stack of printed recipe cards into a woven basket, each card showing a different colorful Korean dish, ending with the basket full and warmly lit. Cozy, inviting, "collect them all" feeling. 9:16 vertical, 7 seconds.
+
+===========================================================
+엔딩 CTA 영상 (5초, 시리즈 공통)
+===========================================================
+
+--- ending-01 ---
+A close-up of a hand closing a Korean cookbook gently on a wooden table, steam from a nearby dish still visible softly out of focus, warm light fading slightly for a satisfying close. Calm, warm, inviting final beat — leaves room for a text overlay CTA to be added in editing (not rendered in the video itself). 9:16 vertical, 5 seconds.
+
+===========================================================
+사용 가이드
+===========================================================
+1. 각 영상(hook + 볼륨별 1~2개 + ending)을 이어붙여서 15~30초 분량의 틱톡 클립 하나를 만드는 걸 권장.
+2. 자막/텍스트 오버레이, 배경음악, 후킹 카피는 CapCut이나 TikTok 편집기에서 영상 생성 후 별도로 추가할 것 (프롬프트 안에는 텍스트 렌더링을 넣지 않았음 — AI가 글자를 깨뜨릴 위험 방지).
+3. 볼륨별 프롬프트는 각 권 홍보용으로 개별 사용 가능, 묶어서 "Korean Food Library 전체 소개" 영상으로도 사용 가능.
+4. 톤은 항상 "진짜 집밥/먹방" 느낌 — 광고 스튜디오 톤이나 과도하게 매끈한 AI 렌더 느낌은 피할 것.
